@@ -29,10 +29,12 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.OutputType;
+import org.openqa.selenium.Platform;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -80,7 +82,7 @@ public class StepImpe {
 	
 	boolean printErrors = new DBUtilities(driver).printErrors; // for printing errors
 	
-	private int sleepMultiplier = 4; // multiplier for the values in Thread.sleep()s. If the site is being slow, increase it for greater pauses between steps. Should not be less than 1.
+	private int sleepMultiplier = 1; // multiplier for the values in Thread.sleep()s. If the site is being slow, increase it for greater pauses between steps. Should not be less than 1.
 	
 
 	
@@ -89,26 +91,39 @@ public class StepImpe {
 	public void startUp() {
 	
 		/* Firefox didn't work for me, but maybe you can figure it out? */
-//		FirefoxDriverManager.getInstance().setup();
-//		System.setProperty("webdriver.gecko.driver", "C:\\Program Files\\Automation Tools\\Drivers\\geckodriver.exe");
-//		File pathToBinary = new File("C:\\Program Files\\Mozilla Firefox\\firefox.exe");
-//		FirefoxBinary ffBinary = new FirefoxBinary(pathToBinary);
-//		FirefoxProfile firefoxProfile = new FirefoxProfile();      
-//		FirefoxBinary ffBinary = new FirefoxBinary(pathToBinary);
-//		FirefoxProfile firefoxProfile = new FirefoxProfile();
-//		FirefoxOptions ffo =  new FirefoxOptions().setBinary(ffBinary).setProfile(firefoxProfile);
+		FirefoxDriverManager.getInstance().setup();
+		File browserAppPath = null;
+		
+		//check if the platform is windows
+		if (Platform.getCurrent().is(Platform.WINDOWS)) {
+		    browserAppPath = new File("C:\\Program Files\\Mozilla Firefox\\firefox.exe");
+		    
+		    // alternative path
+		    if (!browserAppPath.exists()) {
+		       browserAppPath = new File("C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe");
+		   }
+		} else {
+		   // Ubuntu
+		   browserAppPath = new File("/usr/bin/firefox/firefox-bin");
+		}
+		
+		FirefoxBinary ffBinary = new FirefoxBinary(browserAppPath);
+		
+		// create a binary 
+		FirefoxProfile firefoxProfile = new FirefoxProfile();      
+		FirefoxOptions ffo = new FirefoxOptions().setBinary(ffBinary).setProfile(firefoxProfile);
+		driver = new FirefoxDriver(ffo);	
 
 		// use this if your Chrome is only at the latest version
 		//ChromeDriverManager.getInstance().setup();
 		
 		// local only
-		System.setProperty("webdriver.chrome.driver", "C:\\Program Files\\Automation Tools\\Drivers\\chromedriver.exe");
+		//System.setProperty("webdriver.chrome.driver", "C:\\Program Files\\Automation Tools\\Drivers\\chromedriver.exe");
 		
-		driver = new ChromeDriver();
-
 
 	    driver.manage().window().maximize();
-	    
+		//driver.manage().window().setSize(new Dimension(1920, 1080));
+		
 	    // converts sleepMultiplier to 1 if below 1
 	    if (sleepMultiplier < 1){
 	    	sleepMultiplier = 1;
