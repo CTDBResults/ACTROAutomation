@@ -79,7 +79,7 @@ public class StepImpe {
 	final String wcag_subdirectory = "wcagoutput";
 	final String screenshot_subdirectory = "screenshots";
 	Hashtable<String, Integer> summary = new Hashtable<String, Integer>();
-	
+	BROWSER browser_type = BROWSER.CHROME; // change this to change what browser is used
 	boolean printErrors = new DBUtilities(driver).printErrors; // for printing errors
 	
 	private int sleepMultiplier = 1; // multiplier for the values in Thread.sleep()s. If the site is being slow, increase it for greater pauses between steps. Should not be less than 1.
@@ -89,46 +89,72 @@ public class StepImpe {
 	
 	@Before()
 	public void startUp() {
-	
-		/* Firefox didn't work for me, but maybe you can figure it out? */
-		FirefoxDriverManager.getInstance().setup();
-		File browserAppPath = null;
+
+			
+		//Log.info("opening Browser");
+//		//+++++++++++++ FOR CHROME ++++++++++++++++++++++++++
 		
-		//check if the platform is windows
-		if (Platform.getCurrent().is(Platform.WINDOWS)) {
-		    browserAppPath = new File("C:\\Program Files\\Mozilla Firefox\\firefox.exe");
-		    
-		    // alternative path
-		    if (!browserAppPath.exists()) {
-		       browserAppPath = new File("C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe");
-		   }
-		} else {
-		   // Ubuntu
-		   browserAppPath = new File("/usr/bin/firefox/firefox-bin");
+//		// following is added to fix chrome maximise issue
+		
+		if (browser_type == BROWSER.CHROME){
+			System.setProperty("webdriver.chrome.driver", "C:\\Program Files\\Automation Tools\\Drivers\\chromedriver.exe");
+			ChromeOptions options = new ChromeOptions();
+			options.addArguments("test-type");
+			options.addArguments("start-maximized");
+			options.addArguments("--js-flags=--expose-gc");
+			options.addArguments("--enable-precise-memory-info");
+			options.addArguments("--disable-popup-blocking");
+			options.addArguments("--disable-default-apps");
+			options.addArguments("test-type=browser");
+			options.addArguments("disable-infobars");
+			driver = new ChromeDriver(options);
+		}
+		else if (browser_type == BROWSER.FIREFOX){
+			FirefoxDriverManager.getInstance().setup();
+	        File browserAppPath = null;
+	        
+	        //check if the platform is windows
+	        if (Platform.getCurrent().is(Platform.WINDOWS)) {
+	            browserAppPath = new File("C:\\Program Files\\Mozilla Firefox\\firefox.exe");
+	            
+	            // alternative path
+	            if (!browserAppPath.exists()) {
+	               browserAppPath = new File("C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe");
+	           }
+	        } 
+	        else {
+	           // Ubuntu
+	           browserAppPath = new File("/usr/bin/firefox/firefox-bin");
+	        }
+	        
+	        FirefoxBinary ffBinary = new FirefoxBinary(browserAppPath);
+	        
+	        // create a binary 
+	        FirefoxProfile firefoxProfile = new FirefoxProfile();      
+	        FirefoxOptions ffo = new FirefoxOptions().setBinary(ffBinary).setProfile(firefoxProfile);
+	        driver = new FirefoxDriver(ffo); 
+
+			
+		
 		}
 		
-		FirefoxBinary ffBinary = new FirefoxBinary(browserAppPath);
+//		ChromeOptions options = new ChromeOptions();
+//		options.addArguments("test-type");
+//		options.addArguments("start-maximized");
+//		options.addArguments("--js-flags=--expose-gc");
+//		options.addArguments("--enable-precise-memory-info");
+//		options.addArguments("--disable-popup-blocking");
+//		options.addArguments("--disable-default-apps");
+//		options.addArguments("test-type=browser");
+//		options.addArguments("disable-infobars");
+//		driver = new ChromeDriver(options);
+////		
+		//+++++++++++++ FOR FIREFOX ++++++++++++++++++++++++++
+	
+	
 		
-		// create a binary 
-		FirefoxProfile firefoxProfile = new FirefoxProfile();      
-		FirefoxOptions ffo = new FirefoxOptions().setBinary(ffBinary).setProfile(firefoxProfile);
-		driver = new FirefoxDriver(ffo);	
+	
 
-		// use this if your Chrome is only at the latest version
-		//ChromeDriverManager.getInstance().setup();
-		
-		// local only
-		//System.setProperty("webdriver.chrome.driver", "C:\\Program Files\\Automation Tools\\Drivers\\chromedriver.exe");
-		
-
-	    driver.manage().window().maximize();
-		//driver.manage().window().setSize(new Dimension(1920, 1080));
-		
-	    // converts sleepMultiplier to 1 if below 1
-	    if (sleepMultiplier < 1){
-	    	sleepMultiplier = 1;
-	    }
-	    
 	}
 		// **************disable to leave browser open***************************************
 
@@ -157,6 +183,8 @@ public class StepImpe {
 
 	// ********************************************************************************************************************************
 	//*************************************************************** WACG ************************************************************
+	
+	
 	
 	@Given("^I erase previous data$") 
 	public void i_erase_previous_data() throws Throwable {
@@ -641,13 +669,23 @@ public class StepImpe {
 			}
 		}
 		else {
-			DBUtilities createXpath = new DBUtilities(driver);
-			String myxpath = createXpath.xpathMaker(arg1);
-			System.out.println("cliclking on " +myxpath);
-			Assert.assertTrue(driver.findElement(By.xpath(myxpath)).isDisplayed());
-			Thread.sleep(3000 * sleepMultiplier);
-			driver.findElement(By.xpath(myxpath)).click();
-			
+			try {
+				DBUtilities createXpath = new DBUtilities(driver);
+				String myxpath = createXpath.xpathMaker(arg1);
+				System.out.println("cliclking on " +myxpath);
+				Assert.assertTrue(driver.findElement(By.xpath(myxpath)).isDisplayed());
+				Thread.sleep(3000 * sleepMultiplier);
+				driver.findElement(By.xpath(myxpath)).click();
+			}
+			catch (Exception | AssertionError e){
+				
+				DBUtilities createXpath = new DBUtilities(driver);
+				String myxpath = createXpath.xpathMakerContainsText(arg1);
+				System.out.println("cliclking on " +myxpath);
+				Assert.assertTrue(driver.findElement(By.xpath(myxpath)).isDisplayed());
+				Thread.sleep(3000 * sleepMultiplier);
+				driver.findElement(By.xpath(myxpath)).click();
+			}
 		}
 
 		
