@@ -21,7 +21,7 @@ public class HomePage extends DBUtilities {
 			//for production
 		//driver.get("https://ssc.dbresults.com.au/USSPortal");
 		//following is for SIT
-			driver.get("https://dev2-ssc.dbresults.com.au/USSPortal/");
+			driver.get("https://test-ssc.dbresults.com.au/USSPortal/Login.aspx");
 		// for dev
 		//driver.get("https://dev-ssc.dbresults.com.au/USSPortal/");
 			// for p10
@@ -29,8 +29,11 @@ public class HomePage extends DBUtilities {
         
         //****************************************************************************************************************
 		}
-		else if(arg1.equals("USS2")){
-			driver.get("https://dev2-ssc.dbresults.com.au/USSPortal/Login.aspx");
+		else if(arg1.equals("USS2]")){
+			driver.get("https://test-ssc.dbresults.com.au/USSPortal/Login.aspx");
+		}
+		else if(arg1.equals("USSAdmin")){
+			driver.get("https://test-ssc.dbresults.com.au/USSAdminPortal");
 		}
 		else if(arg1.equals("TSS")){
 			//driver.get("https://dev2-ssc.dbresults.com.au/TSSPortal/Homepage.aspx");
