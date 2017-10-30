@@ -160,7 +160,7 @@ public class StepImpe {
 
 	@After()
 	public void tearDown() {	
-		driver.quit();
+		//driver.quit();
 	}
 	//******************************************************************************   
 	    
@@ -620,17 +620,47 @@ public class StepImpe {
 		DBUtilities createXpath = new DBUtilities(driver);
 		myXpath = createXpath.xpathMakerByValue(arg1);
 		try {
+			try {
+				driver.findElement(By.xpath(myXpath)).click();
+			}
+			catch (Exception e ){
+				driver.findElement(By.xpath(myXpath)).submit();
+			}
+		}
+		catch (Exception e2){
+			myXpath = createXpath.xpathMakerByLinkAndText(arg1);
 			driver.findElement(By.xpath(myXpath)).click();
-		}
-		catch (Exception e ){
-			driver.findElement(By.xpath(myXpath)).submit();
-		}
+		}	
 	}
 	
+	@And("^I click on image with filename \"(.*?)\"$")
+	public void i_click_on_image_with_filename(String arg1) throws Throwable {
+		Thread.sleep(3000 * sleepMultiplier);
+		String myXpath = null;
+		DBUtilities createXpath = new DBUtilities(driver);
+		myXpath = createXpath.xpathMakerByImage(arg1);
+		driver.findElement(By.xpath(myXpath)).click();
+//		try {
+//			try {
+//				
+//			}
+//			catch (Exception e ){
+//				driver.findElement(By.xpath(myXpath)).submit();
+//			}
+//		}
+//		catch (Exception e2){
+//			myXpath = createXpath.xpathMakerByLinkAndText(arg1);
+//			driver.findElement(By.xpath(myXpath)).click();
+//		}	
+	}
+	
+	
 	// scrolls down the page, may not be working correctly
-	@And("^I scroll \"(.*?)\" the page$")
-	public void i_scroll_the_page(String arg1) throws Throwable {
-		new DBUtilities(driver).scrollDownThePage(arg1);
+	@And("^I scroll down by factor \"(.*?)\"$")
+	public void i_scroll_down_by_factor(String arg1) throws Throwable {
+		JavascriptExecutor jse = (JavascriptExecutor)driver;
+		String factor = "0," + arg1;
+ 		jse.executeScript("window.scrollBy(0," + arg1 + ")", "");
 	}
 	
 	// scrolls up the page, may not be working correctly
@@ -690,8 +720,18 @@ public class StepImpe {
 
 		
 	}
-
-
+	
+	@Then("^I click on \"(.*?)\" regarding DB topic \"(.*?)\"$")
+	public void i_click_on_regarding_DB_topic(String arg1, String arg2) throws Throwable {
+		DBUtilities createXpath = new DBUtilities(driver);
+		String myxpath = createXpath.xpathMakerByDBTopic(arg1, arg2);
+		System.out.println("clicking DB topic on " +myxpath);
+		Assert.assertTrue(driver.findElement(By.xpath(myxpath)).isDisplayed());
+		Thread.sleep(3000 * sleepMultiplier);
+		driver.findElement(By.xpath(myxpath)).click();
+		
+	}
+	
 	// doesn't always work, be careful
 	@Given("^I select \"(.*?)\" from \"(.*?)\"$")
 	public void i_select_from(String arg1, String arg2) throws Throwable {
@@ -881,6 +921,13 @@ public class StepImpe {
 		PageFactory.initElements(driver, BillingHistoryPage.class).checkIfOnRightPage(arg1); 
 		  
 		  System.out.println(" on correct page " +arg1);
+	}
+	
+	@Given("^I check page has URL \"(.*?)\"$")
+	public void i_check_page_has_URL(String arg1) throws Throwable{
+		String currentURL = driver.getCurrentUrl();
+		Assert.assertTrue(arg1.equals(currentURL));
+		
 	}
 	
 	// check that a checkbox is checked
@@ -1195,5 +1242,18 @@ public class StepImpe {
 
 
 	}
+	
+	
+	// take screenshot
+		@And("^I store a snapshot of page$")
+		
+		public void I_take_a_snapshot_of_the_above_page_as_a_record() throws Throwable {
+//			File scrFile = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
+//		String dnt = DBUtilities.DNT(null);
+//		System.out.println(dnt);
+//		FileUtils.copyFile(scrFile, new File(dnt+".jpg"));
+	        		 
+		}
+
 }
 

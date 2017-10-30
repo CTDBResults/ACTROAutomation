@@ -29,7 +29,7 @@ public class HomePage extends DBUtilities {
         
         //****************************************************************************************************************
 		}
-		else if(arg1.equals("USS2]")){
+		else if(arg1.equals("USS2")){
 			driver.get("https://test-ssc.dbresults.com.au/USSPortal/Login.aspx");
 		}
 		else if(arg1.equals("USSAdmin")){
@@ -43,8 +43,6 @@ public class HomePage extends DBUtilities {
 			//driver.get("https://dev2-ssc.dbresults.com.au/TSSPortal/Homepage.aspx");
 			driver.get("http://dev2-ssc.dbresults.com.au/TSSPortal/Loginadmin.aspx");
 		}
-		
-		
 		 
 		else if(arg1.equals("TSSUAP")){
 			driver.get("https://dev2-ssc.dbresults.com.au/TSSAdminPortal");
@@ -54,7 +52,12 @@ public class HomePage extends DBUtilities {
 			driver.get("https://dev2-ssc.dbresults.com.au/SS_Admin/Tooltips.aspx");
 		}
 		
-
+		else if (arg1.equals("DBTEST")){
+			driver.get("https://dbdigital.stg.dbresults.com.au/Cola/");
+		}
+		else if (arg1.equals("SelfServeTEST")){
+			driver.get("http://selfserveportal.com/");
+		}
 		else if(arg1.equals("Production")){
 			driver.get("https://ssc.dbresults.com.au/TSSPortal/Loginadmin.aspx");
 		}

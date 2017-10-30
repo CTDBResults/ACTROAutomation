@@ -1,0 +1,45 @@
+DB RESULTS FUNCTIONS THAT NEED TO BE TESTED:
+
+-Homepage can be accessed (DONE)
+-All White Rectangle buttons work on Homepage (DONE)
+-Privacy link on footer brings user to the correct page (DONE)
+-Terms of Use link in footer brings user to the correct page (DONE)
+-'Get in touch' form works as inteded (DONE)
+-Youtube icon brings user to the correct page (DONE)
+-Twitter icon brings icon to the correct page
+-LinkedIn icon brings user to the correct page
+
+-Newsroom page can be accessed
+-Newsroom articles can be accessed
+-Newsroom pagination works
+
+-3plus3 page can be accessed
+-Existence of video on 3plus3
+
+-Projects page can be accessed
+-Projects articles can be accessed
+
+-Services page can be accessed
+-Services articles can be accessed
+
+-About Us page can be accessed
+-Partners page can be accessed
+-Partner page icons bring the user to the correct URL
+
+-People page can be accessed
+-Entries are present in the People page
+-The SHOW MORE button works in the People page
+-Sort function works
+
+-DB Blog can be accessed
+-Pagination works on the DB Blog
+-Entries are present on the DB Blog
+-DB Blog entries bring the user to the correct post page
+
+-Careers page can be accessed
+-Apply Now form works
+
+-Contact page can be accessed
+-All links on the Contact page work
+
+-The search function in the header bar works.

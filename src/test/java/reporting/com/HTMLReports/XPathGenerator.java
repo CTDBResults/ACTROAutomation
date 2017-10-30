@@ -130,6 +130,14 @@ public class XPathGenerator {
 		 System.out.println(" xpath " +xpath);
 		 return xpath;
 	 }
+	 
+	 public String xpathMakerByLinkAndText(String arg1){
+		 String xpath = "//a[contains(text(), '"+arg1+"')]";
+		 System.out.println(" xpath " +xpath);
+		 return xpath;
+		// return ;
+	 	
+	 }
 	
 	// combines two xpaths into two 
 	 public String combine2Xpaths (String arg1, String arg2)
@@ -140,6 +148,19 @@ public class XPathGenerator {
 		 System.out.println(truncatedXpath2);
 		 
 		return arg1+truncatedXpath2;
+		 
+	 }
+	 
+	 public String xpathMakerByImage(String arg1){
+		 String xpath = "//img[contains(@src, '"+arg1+"')]";
+		 System.out.println(" xpath " +xpath);
+		 return xpath;
+		 
+	 }
+	 public String xpathMakerByDBTopic(String arg1, String arg2){
+		 String xpath = "//*[contains(text(), '" + arg2 + "')]/..//a[contains(text(), '" + arg1 + "')]";
+		 System.out.println("DB xpath " +xpath);
+		 return xpath;
 		 
 	 }
 	 

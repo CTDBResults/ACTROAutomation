@@ -12,12 +12,12 @@ import cucumber.api.junit.Cucumber;
 // ************************************** USS Portal as on 17/10/2016
 // OCT***********************************
 
-(format = { "pretty", "html:target/html/result.html" },  tags = {"@USS_Regression"},
+(format = { "pretty", "html:target/html/result.html" },  tags = {"@wip"},
     //*********************for SHAKEOUT*************************************
 	//	 features = "src/test/resource/com/USS/SanityTestScript.feature") 
 		
     //****************for Regression****************************
-	 features = "src/test/resource/com/USS/RegressionTests.feature") 
+	// features = "src/test/resource/com/USS/RegressionTests.feature") 
 		
     //********************for wip********************************
 	//	features = "src/test/resource/com/USS/wip.feature") /// wip
@@ -34,6 +34,10 @@ import cucumber.api.junit.Cucumber;
 // ************************************** Admin
 // Portal***********************************
 // features = "src/test/resource/UAP.feature")
+
+
+features = "src/test/resource/com/DB_SS/DB_Regression.feature") 
+
 
 // ****************************************************************************************
 

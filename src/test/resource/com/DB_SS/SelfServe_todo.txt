@@ -1,0 +1,36 @@
+SELF SERVE FUNCTIONS THAT NEED TO BE TESTED:
+
+-Access Homepage
+-All buttons work on Homepage
+-Privacy link on footer brings user to the correct page
+-Terms of Use link in footer brings user to the correct page
+-'Get in touch' form works as inteded
+
+-Newsroom page can be accessed
+-Newsroom articles can be accessed
+-Newsroom pagination works
+
+-Taxation page can be accessed
+-Existence of video on Taxation page
+
+-Utilities page can be accessed
+
+-Benefits page can be accessed
+-Benefits page articles can be accessed
+
+-About Us page can be accessed
+
+-Support policy page can be accessed
+
+-Configuration Requirements page can be accessed
+
+-Partners page can be accessed
+-Partner icons bring the user to the correct URL
+
+-Careers page can be accessed
+-Apply Now form works
+
+-Contact page can be accessed
+-All links on the Contact page work
+
+-The search function in the header bar works.
