@@ -55,8 +55,11 @@ public class HomePage extends DBUtilities {
 		else if (arg1.equals("DBTEST")){
 			driver.get("https://dbdigital.stg.dbresults.com.au/Cola/");
 		}
+//		else if (arg1.equals("DB")){
+//			driver.get("https://dbdigital.stg.dbresults.com.au/Cola/");
+//		}
 		else if (arg1.equals("SelfServeTEST")){
-			driver.get("http://selfserveportal.com/");
+			driver.get("http://test.selfserveportal.com.au/");
 		}
 		else if(arg1.equals("Production")){
 			driver.get("https://ssc.dbresults.com.au/TSSPortal/Loginadmin.aspx");

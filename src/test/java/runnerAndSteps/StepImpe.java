@@ -160,7 +160,7 @@ public class StepImpe {
 
 	@After()
 	public void tearDown() {	
-		//driver.quit();
+		driver.quit();
 	}
 	//******************************************************************************   
 	    
@@ -570,7 +570,16 @@ public class StepImpe {
 		new DBUtilities(driver).tabOut();
 	}
 	
-	
+	@And("^I click \"(.*?)\" regarding DB topic \"(.*?)\"$")
+	public void i_click_regarding_DB_topic(String arg1, String arg2) throws Throwable {
+		DBUtilities createXpath = new DBUtilities(driver);
+		String myxpath = createXpath.xpathMakerByDBTopic(arg1, arg2);
+		System.out.println("clicking DB topic on " +myxpath);
+		Assert.assertTrue(driver.findElement(By.xpath(myxpath)).isDisplayed());
+		Thread.sleep(3000 * sleepMultiplier);
+		driver.findElement(By.xpath(myxpath)).click();
+		
+	}
 		
 	@And("^I click on button \"(.*?)\"$")
 	public void i_click_on_button(String arg1) throws Throwable {
@@ -654,13 +663,39 @@ public class StepImpe {
 //		}	
 	}
 	
+	@And("^I click on link with URL \"(.*?)\"$")
+	public void i_click_on_link_with_URL(String arg1) throws Throwable {
+		Thread.sleep(3000 * sleepMultiplier);
+		String myXpath = null;
+		DBUtilities createXpath = new DBUtilities(driver);
+		myXpath = createXpath.xpathMakerByLinkHref(arg1);
+		
+		driver.findElement(By.xpath(myXpath)).click();
+//		try {
+//			try {
+//				
+//			}
+//			catch (Exception e ){
+//				driver.findElement(By.xpath(myXpath)).submit();
+//			}
+//		}
+//		catch (Exception e2){
+//			myXpath = createXpath.xpathMakerByLinkAndText(arg1);
+//			driver.findElement(By.xpath(myXpath)).click();
+//		}	
+	}
+	
+	
 	
 	// scrolls down the page, may not be working correctly
-	@And("^I scroll down by factor \"(.*?)\"$")
+	@And("^I scroll down by \"(.*?)\" percent$")
 	public void i_scroll_down_by_factor(String arg1) throws Throwable {
 		JavascriptExecutor jse = (JavascriptExecutor)driver;
-		String factor = "0," + arg1;
- 		jse.executeScript("window.scrollBy(0," + arg1 + ")", "");
+		final int pageScrollFactor = 5000;
+		double factor = (Double.parseDouble(arg1) / 100) * pageScrollFactor;
+		System.out.println(factor);
+		//String factor = "0," + arg1;
+ 		jse.executeScript("window.scrollBy(0," + factor + ")", "");
 	}
 	
 	// scrolls up the page, may not be working correctly
@@ -703,7 +738,7 @@ public class StepImpe {
 				DBUtilities createXpath = new DBUtilities(driver);
 				String myxpath = createXpath.xpathMaker(arg1);
 				System.out.println("cliclking on " +myxpath);
-				Assert.assertTrue(driver.findElement(By.xpath(myxpath)).isDisplayed());
+				//Assert.assertTrue(driver.findElement(By.xpath(myxpath)).isDisplayed());
 				Thread.sleep(3000 * sleepMultiplier);
 				driver.findElement(By.xpath(myxpath)).click();
 			}
@@ -712,7 +747,7 @@ public class StepImpe {
 				DBUtilities createXpath = new DBUtilities(driver);
 				String myxpath = createXpath.xpathMakerContainsText(arg1);
 				System.out.println("cliclking on " +myxpath);
-				Assert.assertTrue(driver.findElement(By.xpath(myxpath)).isDisplayed());
+				//Assert.assertTrue(driver.findElement(By.xpath(myxpath)).isDisplayed());
 				Thread.sleep(3000 * sleepMultiplier);
 				driver.findElement(By.xpath(myxpath)).click();
 			}
@@ -721,16 +756,7 @@ public class StepImpe {
 		
 	}
 	
-	@Then("^I click on \"(.*?)\" regarding DB topic \"(.*?)\"$")
-	public void i_click_on_regarding_DB_topic(String arg1, String arg2) throws Throwable {
-		DBUtilities createXpath = new DBUtilities(driver);
-		String myxpath = createXpath.xpathMakerByDBTopic(arg1, arg2);
-		System.out.println("clicking DB topic on " +myxpath);
-		Assert.assertTrue(driver.findElement(By.xpath(myxpath)).isDisplayed());
-		Thread.sleep(3000 * sleepMultiplier);
-		driver.findElement(By.xpath(myxpath)).click();
-		
-	}
+
 	
 	// doesn't always work, be careful
 	@Given("^I select \"(.*?)\" from \"(.*?)\"$")
@@ -747,6 +773,56 @@ public class StepImpe {
 			
 		}
 	}
+	
+	// for the strange dropdowns on the DB Results website, currently doesn't work, be careful
+		@Given("^I hover over \"(.*?)\" and click on \"(.*?)\"$")
+		public void i_hover_over_and_click_on(String arg1, String arg2) throws Throwable {
+			//Thread.sleep(sleepMultiplier * 3000);
+			String myxpath= new DBUtilities(driver).xpathMakerContainsText(arg1);
+			WebElement hoverElement =  driver.findElement(By.xpath(myxpath));
+			WebElement hoverElement2 =  null;
+			String newmyxpath = null;
+			String myxpath2= null;
+			
+			try {
+				hoverElement.click();
+			}
+			catch (Exception e){
+				for (int i = 2; i < 10; i++){
+					newmyxpath = "(" + myxpath + ")[" + i + "]";
+					if (driver.findElements(By.xpath(newmyxpath)).size() != 0){
+						break;
+					}
+				}
+			}
+			System.out.println(newmyxpath);
+			hoverElement =  driver.findElement(By.xpath(newmyxpath));
+			myxpath2= new DBUtilities(driver).xpathMakerByLinkAndText(arg2);
+			System.out.println(myxpath2);
+			String javaScript = "var evObj = document.createEvent('MouseEvents');" +
+                    "evObj.initMouseEvent(\"mouseover\",true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);" +
+                    "arguments[0].dispatchEvent(evObj);";
+			((JavascriptExecutor)driver).executeScript(javaScript, hoverElement);
+	
+			hoverElement2 = driver.findElement(By.xpath(myxpath2));
+			
+			//JavascriptExecutor executor = (JavascriptExecutor)driver;
+			((JavascriptExecutor)driver).executeScript("arguments[0].click()", hoverElement2);
+			//executor.executeScript(, hoverElement2);
+			
+			
+//			Actions builder = new Actions(driver);
+//			//builder.moveToElement(hoverElement).build().perform();
+//			hoverElement.click();
+////			By locator = By.id("clickElementID");
+////			driver.click(locator);
+//			builder.moveToElement(driver.findElement(By.xpath(myxpath2))).build().perform();
+//			builder.click();
+////			builder.moveToElement(driver.findElement(By.xpath(myxpath2))).click();
+//			driver.findElement(By.xpath(myxpath2)).click();
+		}
+	
+	
 	// check for field text and text boxes
 	@And("^I enter the details as$")
 	public void I_enter_then_details_as(DataTable table) throws Throwable {

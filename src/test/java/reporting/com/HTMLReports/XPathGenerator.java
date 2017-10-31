@@ -92,7 +92,7 @@ public class XPathGenerator {
 	 public String xpathMakerByClass(String buttonName)
 	    {
 		//*[@class = 'InfoTooltip OSInline']
-		String xpath = "//*[@class ='"+buttonName+"']";
+		String xpath = "//*[contains(@class,'"+buttonName+"')]";
 		 return xpath;
 	    }
 	 
@@ -133,6 +133,14 @@ public class XPathGenerator {
 	 
 	 public String xpathMakerByLinkAndText(String arg1){
 		 String xpath = "//a[contains(text(), '"+arg1+"')]";
+		 System.out.println(" xpath " +xpath);
+		 return xpath;
+		// return ;
+	 	
+	 }
+	 
+	 public String xpathMakerByLinkHref(String arg1){
+		 String xpath = "//a[contains(@href, '"+arg1+"')]";
 		 System.out.println(" xpath " +xpath);
 		 return xpath;
 		// return ;
