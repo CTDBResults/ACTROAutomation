@@ -22,6 +22,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
@@ -160,7 +161,7 @@ public class StepImpe {
 
 	@After()
 	public void tearDown() {	
-		driver.quit();
+		//driver.quit();
 	}
 	//******************************************************************************   
 	    
@@ -196,6 +197,8 @@ public class StepImpe {
 	    pw.close();
 	    
 	}
+	
+	
 	
 	
 	@Given("^I capture \"(.*?)\"$")
@@ -1179,8 +1182,30 @@ public class StepImpe {
 		}
 	}
 
-	
-
+	@Then("^I check the values of dropdown \"(.*?)\" are alphabetical$")
+	public void i_check_the_values_of_dropdown_are_alphabetical(String arg1) throws Throwable {
+		DBUtilities dbutil = new DBUtilities(driver);
+		String xpath1 = dbutil.xpathMakerBySelectAndId(arg1);
+		WebElement dropdown = driver.findElement(By.xpath(xpath1));
+		Select select = new Select(dropdown);
+		List<WebElement> allOptions = select.getOptions();
+		
+		// convert into string format
+		List<String> allOptionsText = new ArrayList<String>();
+		for (WebElement e: allOptions){
+			allOptionsText.add(e.getText());
+		}
+		
+		// check for sortability
+		boolean sorted = true;        
+	    for (int i = 1; i < allOptionsText.size(); i++) {
+	        if (allOptionsText.get(i-1).compareTo(allOptionsText.get(i)) > 0){ 
+	        	sorted = false;
+	        }
+	    }
+	    Assert.assertTrue(sorted);
+		
+	}	
 
 	//**************************************************************************************************************************
 	//**************************************************************************************************************************
@@ -1294,6 +1319,14 @@ public class StepImpe {
 		object.click();
 	}
 	
+	@Then("^I drag object with xpath \"(.*?)\" onto object with xpath \"(.*?)\"$")
+	public void i_drag_object_with_xpath_onto_object_with_xpath(String arg1, String arg2) throws Throwable{
+		WebElement element = driver.findElement(By.xpath(arg1)); 
+
+		WebElement target = driver.findElement(By.xpath(arg2));
+
+		(new Actions(driver)).dragAndDrop(element, target).perform();
+	}
 	// doesn't seem to work on Chrome
 	@Then("^I upload file with path \"(.*?)\" to \"(.*?)\"$")
 	public void i_upload_file_with_path_to(String arg1, String arg2) throws Throwable{

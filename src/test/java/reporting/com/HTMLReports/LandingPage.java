@@ -41,7 +41,6 @@ public class LandingPage extends DBUtilities {
 					||name.equals("Cancel")
 					||name.equals("Date")
 					||name.equals("Activity")
-					||name.equals("Description")
 					||name.equals("Counter")
 					||name.equals("Type")
 					||name.equals("SaveAndExit")
@@ -157,19 +156,26 @@ public class LandingPage extends DBUtilities {
 		  
     	  String myxpath= new DBUtilities(driver).xpathMakerContainsText(arg1);
     	  driver.findElement(By.xpath(myxpath)).click();
-    	  String myxpath2= new DBUtilities(driver).xpathMakerById(arg2);
+    	  String myxpath2= new DBUtilities(driver).xpathMakerBySelectAndId(arg2);
     	  myxpath2 = myxpath2.replace("*", "select");
     	  System.out.println(myxpath2);	    	  
     	  driver.findElement(By.xpath(myxpath2)).click();
 	  }
 	  catch (Exception e){
-		  String myxpath2= new DBUtilities(driver).xpathMakerById(arg2);
-    	  myxpath2 = myxpath2.replace("*", "select");
-    	  System.out.println(myxpath2);
-    	  driver.findElement(By.xpath(myxpath2)).click();
-    	  
-    	  String myxpath= new DBUtilities(driver).xpathMakerContainsText(arg1);
+//		  String myxpath2= new DBUtilities(driver).xpathMakerById(arg2);
+//    	  myxpath2 = myxpath2.replace("*", "select");
+//    	  System.out.println(myxpath2);
+//    	  driver.findElement(By.xpath(myxpath2)).click();
+//    	  
+//    	  String myxpath= new DBUtilities(driver).xpathMakerContainsText(arg1);
+//    	  driver.findElement(By.xpath(myxpath)).click();
+		  
+		  String myxpath= new DBUtilities(driver).xpathMakerContainsText(arg1);
     	  driver.findElement(By.xpath(myxpath)).click();
+    	  String myxpath2= new DBUtilities(driver).xpathMakerById(arg2);
+    	  myxpath2 = myxpath2.replace("*", "select");
+    	  System.out.println(myxpath2);	    	  
+    	  driver.findElement(By.xpath(myxpath2)).click();
     	  
 	  }
 

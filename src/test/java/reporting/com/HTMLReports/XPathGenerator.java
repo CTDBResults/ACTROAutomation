@@ -172,6 +172,11 @@ public class XPathGenerator {
 		 
 	 }
 	 
+	 public String xpathMakerBySelectAndId(String arg1){
+		 String xpath =  "//select[contains(@id, '"+arg1+"')]";
+		 return xpath;
+		 
+	 }
 	 
 	 
 }
