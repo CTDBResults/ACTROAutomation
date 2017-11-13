@@ -161,7 +161,7 @@ public class StepImpe {
 
 	@After()
 	public void tearDown() {	
-		//driver.quit();
+		driver.quit();
 	}
 	//******************************************************************************   
 	    
@@ -1306,7 +1306,7 @@ public class StepImpe {
 			Assert.assertTrue(regex.matcher(value).matches());
 		}
 		catch (AssertionError | Exception e){
-			String value2 = inputBox.getAttribute("value");;
+			String value2 = inputBox.getAttribute("value");
 			System.out.println("value: " + value2);
 			System.out.println("arg2: " + arg2);
 			Assert.assertTrue(regex.matcher(value2).matches());
@@ -1317,6 +1317,28 @@ public class StepImpe {
 	public void i_click_on_object_with_xpath(String arg1) throws Throwable{
 		WebElement object = driver.findElement(By.xpath(arg1));
 		object.click();
+	}
+	
+	@Then("^I click on checkbox with xpath \"(.*?)\" until it is \"(.*?)\"$")
+	public void i_click_on_object_with_xpath(String arg1, String arg2) throws Throwable{
+		WebElement object = driver.findElement(By.xpath(arg1));
+		boolean status = object.isSelected();
+		if (arg2.equals("checked")){
+			if (!status){
+				object.click();
+			}
+		}
+		else if (arg2.equals("unchecked")){
+			if (status){
+				object.click();
+			}
+		}
+		else{
+			Assert.assertTrue(false);
+		}
+		
+		
+		
 	}
 	
 	@Then("^I drag object with xpath \"(.*?)\" onto object with xpath \"(.*?)\"$")
