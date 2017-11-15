@@ -1142,7 +1142,7 @@ Feature: Regression for TSS
       | PortalName | CompanyName          | ABN         | UserName | Password   |
       | TSSAdmin   | Dynamic Fire Pty Ltd | 80134834334 | jbradley | Dbresults1 |
 
-  
+
   Scenario Outline: DTSP-392: As an end user, I want the Declaration section to be pre-populated on the Summary page so that I don't need to enter my details again
     Given I want to login to portal "<PortalName>"
     And I enter the details as
@@ -1318,6 +1318,8 @@ Feature: Regression for TSS
   ###########################################################################################################
   #STORIES DONE:  78, 136, 141, 176, 185, 522, 578, 583, 584, 592, 608, 617, 622
   #CURRENT ITERATION: 1.1
+  
+ 
   Scenario Outline: DTSP-78: As an end user, I want to be able to select an ABN and view next payment information and lodge from the Right Navigation Panel on my Basic Dashboard
     #Scenario 1: Business Taxpayer associated with multiple ABNs
     Given I want to login to portal "<PortalName>"
@@ -1335,7 +1337,7 @@ Feature: Regression for TSS
     Then I click on button "select2-chosen-1"
     Then I enter the details as
       | Fields               | Value  |
-      | s2id_autogen1_search | DUSTER |
+      | s2id_autogen1_search | DESIGNATE |
     Then I click on button "select2-results-1"
     Then I click on "Sign Out"
     #Scenario 2: Business Taxpayer associated with only 1 ABN
@@ -1458,7 +1460,7 @@ Feature: Regression for TSS
     Then I click on button "select2-chosen-1"
     Then I enter the details as
       | Fields               | Value              |
-      | s2id_autogen1_search | GOOD FOR SOMETHING |
+      | s2id_autogen1_search | NIGHT |
     Then I click on button "select2-results-1"
     Then I see text "You do not have any return history available" displayed
     Then I check "BillComparation" is readonly
@@ -1659,7 +1661,7 @@ Feature: Regression for TSS
       | PortalName | UserName | Password   | ABN         | CRN    |
       | TSSAdmin   | jbradley | Dbresults1 | 13058370433 | 400014 |
 
- 
+  
   Scenario Outline: DTSP-583: As an end user, I want to be able to edit my Contact Person details on my Tax Registration form
     Given I want to login to portal "<PortalName>"
     And I enter the details as
@@ -1697,7 +1699,7 @@ Feature: Regression for TSS
     Then I check "Address_PostCode4" is not readonly
     #Then I check "Address_AddressLine7" is not readonly
     Then I click on button with value "Next"
-    Then I click on button with value "Next"
+   # Then I click on button with value "Next"
     #		Scenario 5: User views 'Tax Registration Update ' Summary page
     Then "<Item>" is displayed as "<ItemName>"
       | Item  | ItemName      |
@@ -2035,7 +2037,7 @@ Feature: Regression for TSS
   ###########################################################################################################
   #DONE: 101, 105, 116, 124, 595, 596, 647, 682
   #MANUAL: 580, 601, 607, 648, 651,
-  @review
+
   Scenario Outline: DTSP-101: As an end user, I want to be able raise an Objection Request so that I can object on the tax amount, penalty, interest and decision on previous objections.
     #Scenarios 4, 5 and 6 must be done manually
     Given I want to login to portal "<PortalName>"
@@ -2112,7 +2114,7 @@ Feature: Regression for TSS
       | PortalName | UserName | Password   | FirstName | LastName | Position            | Organisation | ContactPhone | EmailAddress                      |
       | TSSAdmin   | jbradley | Dbresults1 | J         | Bradley  | DESIGNATE PTY. LTD. | Consultant   | 04 5678 9767 | katherine.santos@dbresults.com.au |
 
-  
+   
   Scenario Outline: DTSP-116: As an end user, I want to be able to submit a Payroll Tax Registration Cancellation Request so that I can cancel my current
     Given I want to login to portal "<PortalName>"
     And I enter the details as
@@ -2163,7 +2165,7 @@ Feature: Regression for TSS
       | PortalName | UserName | Password   | FirstName | LastName | Organisation | Position   | ContactPhone | EmailAddress                      |
       | TSSAdmin   | jbradley | Dbresults1 | J         | Bradley  | AQUA PTY LTD | Consultant | 04 5678 9767 | katherine.santos@dbresults.com.au |
 
-  @done
+
   Scenario Outline: DTSP-124: As an end user, I want to be able to submit an Annual Lodgement Request so that I can submit a request to change my lodgement frequency from monthly to annual
     #Title error in Annual Lodgement Request Summary page, has been flagged
     Given I want to login to portal "<PortalName>"
@@ -2330,6 +2332,7 @@ Feature: Regression for TSS
       | PortalName | UserName | Password   | FirstName | LastName | Position            | Organisation | ContactPhone | EmailAddress                      |
       | TSSAdmin   | jbradley | Dbresults1 | J         | Bradley  | DESIGNATE PTY. LTD. | Consultant   | 04 5678 9767 | katherine.santos@dbresults.com.au |
 
+	 
   Scenario Outline: DTSP-595: As an end user, I want to be able to add/edit/remove ACT group members to my Payroll Tax Group
     Given I want to login to portal "<PortalName>"
     And I enter the details as
@@ -2369,6 +2372,7 @@ Feature: Regression for TSS
       | Fields        | Value       |
       | GrpMember_ABN | 78602736943 |
     #Scenario 4: Save button activated
+    Then I wait for "2000" millisecond
     Then I check "PopUpSaveBT" is not readonly
     #Scenario 5: Successfully validated ABN in PSRM
     Then I click on button "PopUpSaveBT"
@@ -2394,6 +2398,7 @@ Feature: Regression for TSS
     And I enter the details as
       | Fields        | Value       |
       | GrpMember_ABN | 85085664197 |
+      Then I wait for "2000" millisecond
     Then I click on button "PopUpSaveBT"
     Then I wait for "4000" millisecond
     Then I see text "Please enter an ABN that is not already part of a Payroll Tax Group." displayed
@@ -3774,7 +3779,7 @@ Feature: Regression for TSS
     Then I wait for "5000" millisecond
     Then I check object with xpath "//*[contains(@id, 'DeclarationData')]//tr[1]//td[2]" contains "<FirstName>"
     Then I check object with xpath "//*[contains(@id, 'DeclarationData')]//tr[2]//td[2]" contains "<LastName>"
-    Then I check object with xpath "//*[contains(@id, 'DeclarationData')]//tr[3]//td[2]" contains "	DESIGNATE PTY. LTD."
+    Then I check object with xpath "//*[contains(@id, 'DeclarationData')]//tr[3]//td[2]" contains "DESIGNATE PTY. LTD."
     Then I check object with xpath "//*[contains(@id, 'DeclarationData')]//tr[4]//td[2]" contains "<Position>"
     Then I check object with xpath "//*[contains(@id, 'DeclarationData')]//tr[5]//td[2]" contains "<ContactPhone>"
     Then I check object with xpath "//*[contains(@id, 'DeclarationData')]//tr[6]//td[2]" contains "<EmailAddress>"
@@ -4404,7 +4409,7 @@ Feature: Regression for TSS
       | PortalName | UserName | Password   | FirstName | LastName | Position   | Organisation | ContactPhone | EmailAddress                      |
       | TSSAdmin   | jbradley | Dbresults1 | J         | Bradley  | Consultant | AQUA PTY LTD | 04 5678 9767 | katherine.santos@dbresults.com.au |
 
-  
+ 
   Scenario Outline: DTSP-788: As an end user, I want to be able to complete a Utilities(Network Facilities) Tax Return Form so that I can validate it in PSRM
     #Scenario 1: Ambulance Levy  Lodgement
     Given I want to login to portal "<PortalName>"
@@ -4560,7 +4565,7 @@ Feature: Regression for TSS
       | PortalName | UserName | Password   | FirstName | LastName | Position   | Organisation        | ContactPhone | EmailAddress                      |
       | TSSAdmin   | jbradley | Dbresults1 | J         | Bradley  | Consultant | DESIGNATE PTY. LTD. | 04 5678 9767 | katherine.santos@dbresults.com.au |
 
-
+ 
   Scenario Outline: DTSP-796: As an end user, I want to be able to view the Energy Industry Levy lodgement summary page with all calculated fields for Energy Industry Levy
     #Scenario 1: Ambulance Levy  Lodgement
     Given I want to login to portal "<PortalName>"
@@ -5161,7 +5166,7 @@ Feature: Regression for TSS
       | PortalName | UserName | Password   | FirstName | LastName | Position   | Organisation        | ContactPhone | EmailAddress                      |
       | TSSAdmin   | jbradley | Dbresults1 | J         | Bradley  | Consultant | DESIGNATE PTY. LTD. | 04 5678 9767 | katherine.santos@dbresults.com.au |
 
-  @current
+   @fixlater
   Scenario Outline: DTSP-749: As an end user I want to be able to update refund details on Tax Registration updates for different tax types
     Given I want to login to portal "<PortalName>"
     And I enter the details as
@@ -5294,7 +5299,7 @@ Feature: Regression for TSS
       | PortalName | UserName | Password   | FirstName | LastName | Position   | Organisation        | ContactPhone | EmailAddress                      |
       | TSSAdmin   | jbradley | Dbresults1 | J         | Bradley  | Consultant | DESIGNATE PTY. LTD. | 04 5678 9767 | katherine.santos@dbresults.com.au |
 
-  @review
+  
   Scenario Outline: DTSP-865: As a user I want to see changes made on Payroll tax lodgements, registration page and return history so that its consistent with additional tax types
     Given I want to login to portal "<PortalName>"
     And I enter the details as
@@ -5361,7 +5366,7 @@ Feature: Regression for TSS
     Then I click on button "select2-chosen-1"
     Then I enter the details as
       | Fields               | Value      |
-      | s2id_autogen1_search | BLATCHFORD |
+      | s2id_autogen1_search | LOOK AGENCIES PTY. LTD. |
     Then I click on button "select2-results-1"
     Then I see text "You are currently not registered for Payroll Tax" displayed
     Then I click on button "select2-chosen-1"
@@ -5808,7 +5813,7 @@ Feature: Regression for TSS
       | PortalName | UserName | Password   | FirstName | LastName | Position   | Organisation        | ContactPhone | EmailAddress                      |
       | TSSAdmin   | jbradley | Dbresults1 | J         | Bradley  | Consultant | DESIGNATE PTY. LTD. | 04 5678 9767 | katherine.santos@dbresults.com.au |
 
-  @review
+  @wip
   Scenario Outline: DTSP-986: As an end user, I want to see updated date field on my Ambulance Levy Lodgement and Amendment forms, so that I know when my return is due
     Given I want to login to portal "<PortalName>"
     And I enter the details as
@@ -5825,8 +5830,8 @@ Feature: Regression for TSS
       | Fields               | Value          |
       | s2id_autogen1_search | <Organisation> |
     Then I click on button "select2-results-1"
-    Then I select "Jun 2013" from "ObligationsDropdown"
-    Then I check "ReturnDate" contains "Sep 2013"
+    Then I select "Jul 2013" from "ObligationsDropdown"
+    Then I check "ReturnDate" contains "Oct 2013"
     Then I check "ReturnDate" is readonly
     Then I click on button "SaveNextBT"
     Then I enter the details as
@@ -5835,8 +5840,8 @@ Feature: Regression for TSS
       | LodgeAmbulanceLevyAnswer_NumberFamilyMembers |    11 |
     Then I check "SaveAndNextToSummaryBT" is not readonly
     Then I click on button "SaveAndNextToSummaryBT"
-    Then I check object with xpath "//*[contains(text(), 'Reference Period')]//following-sibling::td" contains "Jun 2013"
-    Then I check object with xpath "//*[contains(text(), 'Return Date')]//following-sibling::td" contains "Sep 2013"
+    Then I check object with xpath "//*[contains(text(), 'Reference Period')]//following-sibling::td" contains "Jul 2013"
+    Then I check object with xpath "//*[contains(text(), 'Return Date')]//following-sibling::td" contains "Oct 2013"
     Then I click on "Return History"
     Then I click on button "select2-chosen-1"
     Then I enter the details as
@@ -5850,7 +5855,10 @@ Feature: Regression for TSS
     Then I check I am on "Amend Ambulance Levy Lodgement" page
     Then I check "ObligationToAmend" is readonly
     Then I check "ReturnDate" is readonly
+    
+    #\w{3} \d{4}: pattern for three-letter word and four-digit number (aka date) format
     Then I check object with xpath "//*[contains(@id, 'ObligationToAmend')]" contents match regex "\w{3} \d{4}"
+    
     Then I check object with xpath "//*[contains(@id, 'ReturnDate')]" contents match regex "\w{3} \d{4}"
     Then I click on button with value "Next"
     Then I click on button "SaveAndNextToSummaryBT"

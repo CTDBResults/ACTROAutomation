@@ -2,7 +2,7 @@
 Feature: Some feature
 
   #DONE: 1089, 1092, 1097, 1106, 1111,  1115, 1116, 1117, 1118, 1119, 1120, 1122, 1123, 1124, 1125, 1126, 1127, 1128, 1129, 1139
-  @review
+  @wip
   Scenario Outline: DCSSP-1045: drag and drop field order
     Given I want to login to portal "<PortalName>"
     And I enter the details as
@@ -13,7 +13,10 @@ Feature: Some feature
     And I want to login to portal "USSAdmin"
     Then I click on "CUSTOM FORMS"
     Then I click on "Forms"
-    Then I click on object with xpath "//td[contains(text(), '<FormName>')]/..//span[contains(@class, 'fa-pencil')]"
+    Then I click on object "fa-pencil" next to table entry containing "<FormName>"
+    
+    #Then I click on object with xpath "//td[contains(text(), '<FormName>')]/..//*[contains(@class, 'fa-pencil')]"
+    
     Then I drag object with xpath "//td[contains(text(), 'Brand')]/.." onto object with xpath "//td[contains(text(), 'Reason')]/.."
 
     Examples: 
@@ -52,7 +55,8 @@ Feature: Some feature
     And I want to login to portal "USSAdmin"
     Then I click on "CUSTOM FORMS"
     Then I click on "Forms"
-    Then I click on object with xpath "//td[contains(text(), '<HasFields>')]/..//span[contains(@class, 'fa-pencil')]"
+    #Then I click on object with xpath "//td[contains(text(), '<HasFields>')]/..//span[contains(@class, 'fa-pencil')]"
+    Then I click on object "fa-pencil" next to table entry containing "<HasFields>"
     Then I see text "Add a field" displayed
     Then I click on "Add a field"
     Then I check "FieldName" exists
@@ -61,7 +65,8 @@ Feature: Some feature
     Then I check "FieldName" exists
     #Scenario 1 - add field: Field can be appended to a form.
     Then I click on "Forms"
-    Then I click on object with xpath "//td[contains(text(), '<HasFields>')]/..//span[contains(@class, 'fa-pencil')]"
+    #Then I click on object with xpath "//td[contains(text(), '<HasFields>')]/..//span[contains(@class, 'fa-pencil')]"
+     Then I click on object "fa-pencil" next to table entry containing "<HasFields>"
     Then I see text "Add a field" displayed
     Then I click on "Add a field"
     Then I check "FieldName" exists
@@ -84,7 +89,8 @@ Feature: Some feature
     And I want to login to portal "USSAdmin"
     Then I click on "CUSTOM FORMS"
     Then I click on "Forms"
-    Then I click on object with xpath "//td[contains(text(), '<HasFields>')]/..//span[contains(@class, 'fa-pencil')]"
+    #Then I click on object with xpath "//td[contains(text(), '<HasFields>')]/..//span[contains(@class, 'fa-pencil')]"
+     Then I click on object "fa-pencil" next to table entry containing "<HasFields>"
     Then I see text "Add a field" displayed
     Then I click on "Add a field"
     Then I check "FieldName" exists
@@ -187,6 +193,7 @@ Feature: Some feature
     Then I click on "Form Groups"
     #Scenario 5: Admin edits Form Group – mandatory fields not filled in
     Then I click on object with xpath "//td[contains(text(), '<Unique>')]//..//span[contains(@class, 'fa-pencil')]"
+     Then I click on object "fa-pencil" next to table entry containing "<Unique>"
     Then I wait for "2000" millisecond
     And I enter the details as
       | Fields    | Value |
@@ -207,11 +214,13 @@ Feature: Some feature
     Then I see text "<NotUnique>" displayed
     #Scenario 9: Admin cancels edit function with no unsaved changes
     Then I click on object with xpath "//td[contains(text(), '<Unique>')]//..//span[contains(@class, 'fa-pencil')]"
+     Then I click on object "fa-pencil" next to table entry containing "<Unique>"
     Then I wait for "2000" millisecond
     Then I click on button "fa fa-fw fa-times fa-lg"
     Then I see text "<NotUnique>" displayed
     #Scenario 7: Admin successfully edits a Form Group
     Then I click on object with xpath "//td[contains(text(), '<Unique>')]//..//span[contains(@class, 'fa-pencil')]"
+     Then I click on object "fa-pencil" next to table entry containing "<Unique>"
     Then I wait for "2000" millisecond
     And I enter the details as
       | Fields    | Value     |
@@ -312,7 +321,8 @@ Feature: Some feature
     Then I check I am on "Forms" page
     #Scenario 6: Admin edits Form – mandatory fields not filled in
     #click on the pencil icon that allows editing
-    Then I click on object with xpath "//td[contains(text(), '<Unique>')]/..//span[contains(@class, 'fa-pencil')]"
+   # Then I click on object with xpath "//td[contains(text(), '<Unique>')]/..//span[contains(@class, 'fa-pencil')]"
+     Then I click on object "fa-pencil" next to table entry containing "<Unique>"
     Then I check I am on "<Unique>" page
     #Scenario 7: Admin edits Form – Form Code not unique
     And I enter the details as
@@ -341,7 +351,8 @@ Feature: Some feature
     Then I see "Are you sure you want to discard changes made?" displayed on popup and I click "OK"
     Then I check I am on "Create New Form" page
     #Scenario 10: Admin cancels edit function with no unsaved changes
-    Then I click on object with xpath "//td[contains(text(), '<Unique>')]/..//span[contains(@class, 'fa-pencil')]"
+    #Then I click on object with xpath "//td[contains(text(), '<Unique>')]/..//span[contains(@class, 'fa-pencil')]"
+     Then I click on object "fa-pencil" next to table entry containing "<Unique>"
     Then I click on button with value "Cancel"
     Then I check I am on "Create New Form" page
 
@@ -361,12 +372,14 @@ Feature: Some feature
     Then I click on "CUSTOM FORMS"
     Then I click on "Forms"
     #Scenario 1: Admin deletes Form with associated Fields
-    Then I click on object with xpath "//td[contains(text(), '<HasFields>')]/..//span[contains(@class, 'fa-pencil')]"
+    #Then I click on object with xpath "//td[contains(text(), '<HasFields>')]/..//span[contains(@class, 'fa-pencil')]"
+     Then I click on object "fa-pencil" next to table entry containing "<HasFields>"
     Then I click on button with value "Delete"
     Then I see text "There are Fields associated to this Form. Please remove the fields on the Form and try again." displayed
     #Scenario 3: Admin cancels delete function of a Form which has no Fields associated
     Then I click on "Forms"
-    Then I click on object with xpath "//td[contains(text(), '<NoFields>')]/..//span[contains(@class, 'fa-pencil')]"
+   # Then I click on object with xpath "//td[contains(text(), '<NoFields>')]/..//span[contains(@class, 'fa-pencil')]"
+     Then I click on object "fa-pencil" next to table entry containing "<NoFields>"
     Then I click on button with value "Delete"
     Then I see "Are you sure you want to delete this Form?" displayed on popup and I click "Cancel"
     Then I check I am on "<NoFields>" page
@@ -486,7 +499,8 @@ Feature: Some feature
     Then I click on button with value "Cancel"
     Then I check I am on "Form Driver Configurations" page
     #Scenario 6: Admin edits Driver Configuration – mandatory fields not filled in
-    Then I click on object with xpath "//td[contains(text(), '<Unique>')]/..//span[contains(@class, 'fa-pencil')]"
+    #Then I click on object with xpath "//td[contains(text(), '<Unique>')]/..//span[contains(@class, 'fa-pencil')]"
+     Then I click on object "fa-pencil" next to table entry containing "<Unique>"
     Then I check I am on "<Unique>" page
     #Scenario 7: Admin edits Form – Form Code not unique
     And I enter the details as
@@ -504,7 +518,8 @@ Feature: Some feature
       | CustomFormURLDriver_URL  | <Unique>2 |
     Then I click on button with value "Submit"
     Then I see text "Driver Configuration updated successfully." displayed
-    Then I click on object with xpath "//td[contains(text(), '<Unique>')]/..//span[contains(@class, 'fa-pencil')]"
+   # Then I click on object with xpath "//td[contains(text(), '<Unique>')]/..//span[contains(@class, 'fa-pencil')]"
+    Then I click on object "fa-pencil" next to table entry containing "<Unique>"
     Then I check I am on "<Unique>" page
     #Scenario 9: Admin cancels edit function with unsaved changes
     And I enter the details as
@@ -516,7 +531,8 @@ Feature: Some feature
     Then I see "Are you sure you want to discard changes made?" displayed on popup and I click "OK"
     Then I check I am on "Form Driver Configurations" page
     #Scenario 10: Admin cancels edit function with no unsaved changes
-    Then I click on object with xpath "//td[contains(text(), '<Unique>')]/..//span[contains(@class, 'fa-pencil')]"
+   # Then I click on object with xpath "//td[contains(text(), '<Unique>')]/..//span[contains(@class, 'fa-pencil')]"
+    Then I click on object "fa-pencil" next to table entry containing "<Unique>"
     Then I click on button with value "Cancel"
     Then I check I am on "Form Driver Configurations" page
 
@@ -536,12 +552,14 @@ Feature: Some feature
     Then I click on "CUSTOM FORMS"
     Then I click on "Form Driver Configuration"
     #Scenario 1: Admin deletes Driver Configuration with Form Types associated
-    Then I click on object with xpath "//td[contains(text(), '<Associated>')]/..//span[contains(@class, 'fa-pencil')]"
+ #   Then I click on object with xpath "//td[contains(text(), '<Associated>')]/..//span[contains(@class, 'fa-pencil')]"
+     Then I click on object "fa-pencil" next to table entry containing "<Associated>"
     Then I click on button with value "Delete"
     Then I see text "There are Forms associated to this Driver Configuration. Please update the Driver on the Forms and try again." displayed
     #Scenario 2: Admin deletes Driver Configuration which has no Form Types associated
     Then I click on "Form Driver Configuration"
-    Then I click on object with xpath "//td[contains(text(), '<NoAssociation>')]/..//span[contains(@class, 'fa-pencil')]"
+    #Then I click on object with xpath "//td[contains(text(), '<NoAssociation>')]/..//span[contains(@class, 'fa-pencil')]"
+     Then I click on object "fa-pencil" next to table entry containing "<NoAssociation>"
     Then I click on button with value "Delete"
     #Scenario 3: Admin cancels delete function of a Driver Configuration which is not associated to a Form
     Then I see "Are you sure you want to delete this Driver?" displayed on popup and I click "Cancel"
@@ -602,7 +620,8 @@ Feature: Some feature
     Then I click on "CUSTOM FORMS"
     Then I click on "Forms"
     #Scenario 1: Admin views a Form with no Fields added
-    Then I click on object with xpath "//td[contains(text(), 'Formtest23')]/..//span[contains(@class, 'fa-pencil')]"
+   # Then I click on object with xpath "//td[contains(text(), 'Formtest23')]/..//span[contains(@class, 'fa-pencil')]"
+     Then I click on object "fa-pencil" next to table entry containing "Formtest23"
     Then I see text "Add a field" displayed
     Then I check object with xpath "//th[contains(text(), 'Field')]" exists
     Then I check object with xpath "//th[contains(text(), 'Type')]" exists
@@ -614,7 +633,8 @@ Feature: Some feature
       | Item7 | Mandatory |
     Then I click on "Forms"
     #Scenario 2: Admin views a Form with Fields added
-    Then I click on object with xpath "//td[contains(text(), '<FormName>')]/..//span[contains(@class, 'fa-pencil')]"
+#    Then I click on object with xpath "//td[contains(text(), '<FormName>')]/..//span[contains(@class, 'fa-pencil')]"
+     Then I click on object "fa-pencil" next to table entry containing "<FormName>"
     Then I see text "Add a field" displayed
     Then I check object with xpath "//th[contains(text(), 'Field')]" exists
     Then I check object with xpath "//th[contains(text(), 'Type')]" exists
@@ -630,7 +650,7 @@ Feature: Some feature
       | PortalName | UserName  | Password | FormName                  | NewField        |
       | USS        | christian | Aussie11 | AutomationTestDONOTDELETE | Premise Address |
 
- 
+ 	@wip
   Scenario Outline: DSCPP-1128: add fields to a form inline
     Given I want to login to portal "<PortalName>"
     And I enter the details as
@@ -641,7 +661,8 @@ Feature: Some feature
     And I want to login to portal "USSAdmin"
     Then I click on "CUSTOM FORMS"
     Then I click on "Forms"
-    Then I click on object with xpath "//td[contains(text(), '<FormName>')]/..//span[contains(@class, 'fa-pencil')]"
+#    Then I click on object with xpath "//td[contains(text(), '<FormName>')]/..//span[contains(@class, 'fa-pencil')]"
+     Then I click on object "fa-pencil" next to table entry containing "<FormName>"
     Then I see text "Add a field" displayed
     Then I click on "Add a field"
     Then I check "FieldName" exists
@@ -655,10 +676,12 @@ Feature: Some feature
     Then I click on button with value "Submit"
     #		Then I see "Are you sure you want to discard changes made?" displayed on popup and I click "OK"
     Then I click on "Forms"
-    Then I click on object with xpath "//td[contains(text(), '<FormName>')]/..//span[contains(@class, 'fa-pencil')]"
+    #Then I click on object with xpath "//td[contains(text(), '<FormName>')]/..//span[contains(@class, 'fa-pencil')]"
+     Then I click on object "fa-pencil" next to table entry containing "<FormName>"
     #Scenario 2: Admin edits a field on a Form
     Then I click on "Forms"
-    Then I click on object with xpath "//td[contains(text(), '<FormName>')]/..//span[contains(@class, 'fa-pencil')]"
+   # Then I click on object with xpath "//td[contains(text(), '<FormName>')]/..//span[contains(@class, 'fa-pencil')]"
+   Then I click on object "fa-pencil" next to table entry containing "<FormName>"
     Then I click on "Car Description"
     Then I wait for "2000" millisecond
     And I enter the details as
@@ -689,7 +712,8 @@ Feature: Some feature
     And I want to login to portal "USSAdmin"
     Then I click on "CUSTOM FORMS"
     Then I click on "Forms"
-    Then I click on object with xpath "//td[contains(text(), '<FormName>')]/..//span[contains(@class, 'fa-pencil')]"
+   # Then I click on object with xpath "//td[contains(text(), '<FormName>')]/..//span[contains(@class, 'fa-pencil')]"
+    Then I click on object "fa-pencil" next to table entry containing "<FormName>"
     Then I see text "Add a field" displayed
     Then I click on "Add a field"
     Then I check "FieldName" exists
@@ -757,6 +781,7 @@ Feature: Some feature
     
     #Scenario 1: Portal Administrator views Customer Search Verification page 
     
+    #xpath steps are needed here because the way the checkboxes are designed means they can't be assigned unique ids
     Then I check object with xpath "//div[contains(text(), 'Account No.')]/../..//input" exists
     Then I check object with xpath "//div[contains(text(), 'Username')]/../..//input" exists
     Then I check object with xpath "//div[contains(text(), 'Mobile No.')]/../..//input" exists
@@ -765,6 +790,8 @@ Feature: Some feature
     
     
     #Scenario 2: Portal Administrator updates CSR Search Criteria 
+    
+    #Search for the checkboxes
     Then I click on checkbox with xpath "//div[contains(text(), 'Account No.')]/../..//input" until it is "checked"
     Then I click on checkbox with xpath "//div[contains(text(), 'Username')]/../..//input" until it is "checked"
     Then I click on checkbox with xpath "//div[contains(text(), 'Mobile No.')]/../..//input" until it is "checked"
@@ -808,7 +835,8 @@ Feature: Some feature
       | PortalName | UserName  | UserName2 | Password | Password2 | FormName       | NewField        |
       | USS        | christian | Maxx | Aussie11 | Aussie | AutomationTest | Premise Address |
 
-      @wip
+ 
+
      Scenario Outline: DCSSP-1092: As a CSR agent, I should only see customers that return an exact match to my search criteria so that I’m prevented from searching across the entire database for security purposes
      Given I want to login to portal "<PortalName>"
      And I enter the details as

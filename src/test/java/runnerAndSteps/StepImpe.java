@@ -583,6 +583,14 @@ public class StepImpe {
 		driver.findElement(By.xpath(myxpath)).click();
 		
 	}
+	
+	@Then("^I click on object \"(.*?)\" next to table entry containing \"(.*?)\"$")
+	public void i_click_on_next_to_table_entry_containing(String arg1, String arg2) throws Throwable{
+		String xpath = "//td[contains(text(), '"+arg2 + "')]/..//*[contains(@class, '" +arg1 + "')]";
+		WebElement element = driver.findElement(By.xpath(xpath)); 
+		element.click();
+		
+	}
 		
 	@And("^I click on button \"(.*?)\"$")
 	public void i_click_on_button(String arg1) throws Throwable {
@@ -1340,6 +1348,7 @@ public class StepImpe {
 		
 		
 	}
+	
 	
 	@Then("^I drag object with xpath \"(.*?)\" onto object with xpath \"(.*?)\"$")
 	public void i_drag_object_with_xpath_onto_object_with_xpath(String arg1, String arg2) throws Throwable{
