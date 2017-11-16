@@ -183,8 +183,10 @@ public class StepImpe {
 	
 
 	// ********************************************************************************************************************************
-	//*************************************************************** WACG ************************************************************
-	
+	//*************************************************************** WCAG ************************************************************
+	//*********************************************************************************************************************************
+
+	/*** STEPS CRUCIAL TO THE GENERATION OF WCAG REPORTS ***/
 	
 	
 	@Given("^I erase previous data$") 
@@ -362,8 +364,26 @@ public class StepImpe {
 			clipboard.setContents(oldSelection, oldSelection);
 		
 	}
+	//****************************************************************************************************************************************
+	//*************************************************************** END OF WCAG ************************************************************
+	//****************************************************************************************************************************************
 	
-	// checks if something is not readonly (i.e. activated)
+
+	
+	
+	//*******************************************************************************************************************************************************
+	//*************************************************************** CONTENT CONFIRMATION STEPS ************************************************************
+	//*******************************************************************************************************************************************************
+
+	/*** STEPS THAT CHECK THE STATE OR CONTENT OF OBJECTS ON THE WEBPAGE ***/
+	
+	@Then("^\"(.*?)\" is displayed as \"(.*?)\"$")
+	public void is_displayed_as(String arg1, String arg2, DataTable table) throws Throwable {
+
+		PageFactory.initElements(driver, LandingPage.class).checkElementPresentOnScreen(table);
+	}
+
+	
 	@Then("^I check \"(.*?)\" is not readonly$")
 	public void i_check_is_not_readonly(String arg1) throws Throwable {
 		DBUtilities createXpath = new DBUtilities(driver);
@@ -372,6 +392,8 @@ public class StepImpe {
 		WebElement some_element = driver.findElement(By.xpath(myXpath));
 		Assert.assertTrue(some_element.isEnabled());
 	}
+	
+	
 	
 	
 	// to check if asterisk is present on a mandatory field
@@ -459,6 +481,20 @@ public class StepImpe {
 	}
 	
 	
+	//check i am on right page
+	@Given("^I check I am on \"(.*?)\" page$")
+	public void i_check_I_am_on_page(String arg1) throws Throwable {
+		PageFactory.initElements(driver, BillingHistoryPage.class).checkIfOnRightPage(arg1); 
+		  
+		  System.out.println(" on correct page " +arg1);
+	}
+	
+	@Given("^I check page has URL \"(.*?)\"$")
+	public void i_check_page_has_URL(String arg1) throws Throwable{
+		String currentURL = driver.getCurrentUrl();
+		Assert.assertTrue(arg1.equals(currentURL));
+		
+	}
 	
 	
 	
@@ -547,31 +583,231 @@ public class StepImpe {
 		}
 	}
 	
-	
-	
-	//*************************************************************************************************************************
-	
-	
-	@Given("^I want to login to portal \"(.*?)\"$")
-	public void i_want_to_login_to_portal(String arg1) throws Throwable {
-		HomePage home = PageFactory.initElements(driver, HomePage.class);
-		home.navigateTo(arg1);	
-	}
-
-
-	@And("^I hit Enter$")
-    public LandingPage I_hit_Enter() throws InterruptedException {
-		PageFactory.initElements(driver, LandingPage.class).hitEnter();
-		Thread.sleep(3000 * sleepMultiplier);
+	// CHECK ELEMENT IS READ ONLY
+		@Then("^I check \"(.*?)\" is readonly$")
+		public void i_check_is(String arg1) throws Throwable {
+			PageFactory.initElements(driver, DBUtilities.class).elementIsreadOnly(arg1);
+		}
 		
-		return PageFactory.initElements(driver, LandingPage.class);
+		
+		
+		@Then("^I check \"(.*?)\" exists$")
+		public void i_check_exists(String arg1) throws Throwable {
+			Thread.sleep(3000 * sleepMultiplier);
+			DBUtilities checkElementDisplayed = new DBUtilities(driver);
+			try {
+				String myxpath = checkElementDisplayed.xpathMakerById(arg1);
+				WebElement object = driver.findElement(By.xpath(myxpath));
+				Assert.assertTrue(object.isDisplayed());
+			}
+			catch (Exception e){
+				if (printErrors) e.printStackTrace();
+				String myxpath = checkElementDisplayed.xpathMakerByClass(arg1);
+				WebElement object = driver.findElement(By.xpath(myxpath));
+				Assert.assertTrue(object.isDisplayed());
+			}
+			
+			
+		}
+		
+
+		
+		
+		@Then("^I check \"(.*?)\" does not exist$")
+		public void i_check_does_not_exist(String arg1) throws Throwable {
+			DBUtilities checkElementDisplayed = new DBUtilities(driver);
+			String myxpath = checkElementDisplayed.xpathMakerById(arg1);
+			//WebElement object = driver.findElement(By.xpath(myxpath));
+			System.out.println("Elements found: " + driver.findElements(By.xpath(myxpath)).size());
+			try {
+				Assert.assertFalse(!driver.findElement(By.xpath(myxpath)).isDisplayed());
+			}
+			catch (NoSuchElementException nsee){
+				Assert.assertFalse(false);
+			}
+			
+			
+		}
+		
+		// used to have problems with Jenkins, but should work now
+		@Then("^I check \"(.*?)\" has CSS property \"(.*?)\" with value \"(.*?)\"$")
+		public void i_check_has_a_css_property_with_value (String arg1, String arg2, String arg3) throws Throwable{
+			DBUtilities dbutil = new DBUtilities(driver);
+			String xpath1 = dbutil.xpathMakerById(arg1);
+			String property = arg2;
+			String cssVal = arg3;
+			String currentCssVal = null;
+			try {
+				currentCssVal = driver.findElement(By.xpath(xpath1)).getCssValue(arg2);
+				System.out.println("Comparing '" + cssVal + "' against the property value found: '" + currentCssVal + "'.");
+				Assert.assertTrue(cssVal.equals(currentCssVal));
+			}
+			// specifically for finding CSS values of labels with ::after psuedo selector
+			catch (AssertionError | Exception e){
+				try {
+					xpath1 = dbutil.xpathMakerByLabelAndId(arg1);
+					WebElement currentElement = driver.findElement(By.xpath(xpath1));
+					currentCssVal = ((JavascriptExecutor) driver).executeScript("return window.getComputedStyle(arguments[0], '::after').getPropertyValue('" + property + "');",currentElement).toString();
+					System.out.println("Comparing '" + cssVal + "' against the property value found: '" + currentCssVal + "'.");
+					Assert.assertTrue(cssVal.equals(currentCssVal));
+				}
+				catch (AssertionError | Exception ae2) {
+					try {
+						xpath1 = dbutil.xpathMakerBySpanAndId(arg1);
+						WebElement currentElement = driver.findElement(By.xpath(xpath1));
+						currentCssVal = ((JavascriptExecutor) driver).executeScript("return window.getComputedStyle(arguments[0], '::after').getPropertyValue('" + property + "');",currentElement).toString();
+						System.out.println("Comparing '" + cssVal + "' against the property value found: '" + currentCssVal + "'.");
+						Assert.assertTrue(cssVal.equals(currentCssVal));
+					}
+					catch (AssertionError | Exception ae3){
+						xpath1 = dbutil.xpathMakerBySpanAndClass(arg1);
+						WebElement currentElement = driver.findElement(By.xpath(xpath1));
+						currentCssVal = ((JavascriptExecutor) driver).executeScript("return window.getComputedStyle(arguments[0], '::after').getPropertyValue('" + property + "');",currentElement).toString();
+						System.out.println("Comparing '" + cssVal + "' against the property value found: '" + currentCssVal + "'.");
+						Assert.assertTrue(cssVal.equals(currentCssVal));
+					}
+				}
+				
+			}
+		}
+
+		@Then("^I check the values of dropdown \"(.*?)\" are alphabetical$")
+		public void i_check_the_values_of_dropdown_are_alphabetical(String arg1) throws Throwable {
+			DBUtilities dbutil = new DBUtilities(driver);
+			String xpath1 = dbutil.xpathMakerBySelectAndId(arg1);
+			WebElement dropdown = driver.findElement(By.xpath(xpath1));
+			Select select = new Select(dropdown);
+			List<WebElement> allOptions = select.getOptions();
+			
+			// convert into string format
+			List<String> allOptionsText = new ArrayList<String>();
+			for (WebElement e: allOptions){
+				allOptionsText.add(e.getText());
+			}
+			
+			// check for sortability
+			boolean sorted = true;        
+		    for (int i = 1; i < allOptionsText.size(); i++) {
+		        if (allOptionsText.get(i-1).compareTo(allOptionsText.get(i)) > 0){ 
+		        	sorted = false;
+		        }
+		    }
+		    Assert.assertTrue(sorted);
+			
+		}	
+	
+		
+	@Then("^I see \"(.*?)\" displayed on popup and I click \"(.*?)\"$")
+	public void i_see_displayed_on_popup_and_I_click(String arg1, String arg2) throws Throwable {
+   Thread.sleep(3000);
+		PageFactory.initElements(driver, DBUtilities.class).checkPopUpMessage(arg1);
+		PageFactory.initElements(driver, DBUtilities.class).clickOnPopUP(arg2);
+
 	}
 	
-	//will be used to tab out to activate a button incase the button is not activated.
-	@Given("^I Tab Out$")
-	public void i_Tab_Out() throws Throwable {
-		new DBUtilities(driver).tabOut();
+
+	@Then("^I see \"(.*?)\" displayed$")
+	public void i_see_and_displayed(String arg1) throws Throwable {
+		PageFactory.initElements(driver, LandingPage.class).checkUIElementIsDisplayed(arg1);
+
 	}
+	
+	@Then("^I see text \"(.*?)\" displayed$")
+	public void i_see_text_displayed(String arg1) throws Throwable {
+      LandingPage AU = PageFactory.initElements(driver, LandingPage.class);
+
+      DBUtilities checkElementDisplayed = new DBUtilities(driver);
+		Thread.sleep(3000 * sleepMultiplier);
+		String myxpath = checkElementDisplayed.xpathMakerContainsText(arg1);                                // keep an eye...changed because of 520
+		System.out.println("checking for text " +myxpath);
+		Assert.assertTrue(driver.getPageSource().contains(arg1)); // other methods may not work
+
+	}
+	
+	@Then("^I see text \"(.*?)\" shown$")
+	public void i_see_text_shown(String arg1) throws Throwable {
+      LandingPage AU = PageFactory.initElements(driver, LandingPage.class);
+      Thread.sleep(3000 * sleepMultiplier);
+      DBUtilities checkElementDisplayed = new DBUtilities(driver);
+		String myxpath = checkElementDisplayed.xpathMakerContainsText(arg1);                                // keep an eye...changed because of 520
+		System.out.println("checking for text " +myxpath);
+	
+		Assert.assertTrue(driver.getPageSource().contains(arg1));
+
+	}
+	
+	@Then("^I see text \"(.*?)\" not displayed$")
+	public void i_see_text_not_displayed(String arg1) throws Throwable {
+		DBUtilities checkElementDisplayed = new DBUtilities(driver);
+		Thread.sleep(3000 * sleepMultiplier);
+		String myxpath = checkElementDisplayed.xpathMakerContainsText(arg1);                                // keep an eye...changed because of 520
+		System.out.println("Checking for text: " +myxpath);
+	
+		try {
+			Assert.assertFalse(!driver.findElement(By.xpath(myxpath)).isDisplayed());
+		}
+		catch (Exception | AssertionError ae){
+			Assert.assertFalse(false);
+		}
+	}
+	
+
+	// check that a checkbox is checked
+	@Then("^I see checkbox \"(.*?)\" as selected$")
+	public void i_see_checkbox_as_selected (String arg1) throws Throwable {
+		DBUtilities createXpath = new DBUtilities(driver);
+		String myxpath = createXpath.xpathMakerById(arg1);
+		System.out.println("Checking if checkbox " +myxpath + " has been selected.");
+		Assert.assertTrue(driver.findElement(By.xpath(myxpath)).isSelected());
+	}
+	
+	@Then("^I see checkbox \"(.*?)\" as not selected$")
+	public void i_see_checkbox_as_not_selected (String arg1) throws Throwable {
+		DBUtilities createXpath = new DBUtilities(driver);
+		String myxpath = createXpath.xpathMakerById(arg1);
+		System.out.println("Checking if checkbox " +myxpath + " has not been selected.");
+		Assert.assertFalse(driver.findElement(By.xpath(myxpath)).isSelected());
+	}
+	
+	
+	// check the dropdown displays expected
+	@Then("^\"(.*?)\" displays \"(.*?)\" by default$")
+	public void displays_by_default(String arg1, String arg2) throws Throwable {
+		DBUtilities createXpath = new DBUtilities(driver);
+		String myXpath = createXpath.xpathMakerContainsText(arg2);
+		WebElement dropdownValue = driver.findElement(By.xpath(myXpath));
+		System.out.println(dropdownValue.getText());
+		PageFactory.initElements(driver, AccountFinancialHistorypage.class).isTextPresent(arg2);
+		
+	}
+	
+	
+	@Then("^I hover on \"(.*?)\" to verify \"(.*?)\" is displayed$")
+	public void i_hover_on_to_verify_is_displayed(String arg1, String arg2) throws Throwable {
+		PageFactory.initElements(driver, MakeAPaymentPage.class).hoverOverElement(arg1, arg2);
+	}
+	
+	@Then("^I will see message \"(.*?)\"$")    // this is just a workaround for the temp para coming in
+	public void i_will_see_message(String arg1) throws Exception {
+		
+		Assert.assertTrue(driver.findElement(By.xpath("//*[contains(text(),arg1)]")).isDisplayed());
+		System.out.println("Message sucessfully displayed as " +arg1);
+		Thread.sleep(3000 * sleepMultiplier);
+	}
+
+	
+	//**************************************************************************************************************************************************************
+	//*************************************************************** END OF CONTENT CONFIRMATION STEPS ************************************************************
+	//**************************************************************************************************************************************************************
+
+
+		
+
+	//******************************************************************************************************************************************
+	//*************************************************************** CLICKING STEPS ************************************************************
+	//*******************************************************************************************************************************************
+		
+	/*** STEPS THAT CLICK ON SOMETHING ON THE WEBPAGE ***/
 	
 	@And("^I click \"(.*?)\" regarding DB topic \"(.*?)\"$")
 	public void i_click_regarding_DB_topic(String arg1, String arg2) throws Throwable {
@@ -660,18 +896,7 @@ public class StepImpe {
 		DBUtilities createXpath = new DBUtilities(driver);
 		myXpath = createXpath.xpathMakerByImage(arg1);
 		driver.findElement(By.xpath(myXpath)).click();
-//		try {
-//			try {
-//				
-//			}
-//			catch (Exception e ){
-//				driver.findElement(By.xpath(myXpath)).submit();
-//			}
-//		}
-//		catch (Exception e2){
-//			myXpath = createXpath.xpathMakerByLinkAndText(arg1);
-//			driver.findElement(By.xpath(myXpath)).click();
-//		}	
+
 	}
 	
 	@And("^I click on link with URL \"(.*?)\"$")
@@ -682,18 +907,6 @@ public class StepImpe {
 		myXpath = createXpath.xpathMakerByLinkHref(arg1);
 		
 		driver.findElement(By.xpath(myXpath)).click();
-//		try {
-//			try {
-//				
-//			}
-//			catch (Exception e ){
-//				driver.findElement(By.xpath(myXpath)).submit();
-//			}
-//		}
-//		catch (Exception e2){
-//			myXpath = createXpath.xpathMakerByLinkAndText(arg1);
-//			driver.findElement(By.xpath(myXpath)).click();
-//		}	
 	}
 	
 	
@@ -709,83 +922,18 @@ public class StepImpe {
  		jse.executeScript("window.scrollBy(0," + factor + ")", "");
 	}
 	
-	// scrolls up the page, may not be working correctly
-	@And("^I scroll up$")
-	public void i_scroll_up() throws Throwable {
-		JavascriptExecutor jse = (JavascriptExecutor)driver;
-		jse.executeScript("window.scrollBy(0,-5000)", "");
-	}
 	
-	// for clicking on text
-	@And("^I click on \"(.*?)\"$")
-	public void i_click_on(String arg1) throws Throwable {
-		
-		// give time for page loading
-		Thread.sleep(3000 * sleepMultiplier);
-		Pattern datePattern = Pattern.compile("\\d\\d\\d\\d\\d\\d\\d\\d"); // date pattern as used in the old calendar popup
-
-		// this if block was used to click on the calendar popup; it is now depreciated
-		if (datePattern.matcher(arg1).matches()){
-			DBUtilities createXpath = new DBUtilities(driver);
-			String myxpath4 = createXpath.xpathMakerContainsCustomField("dyc-date", arg1);
-			try {
-				driver.findElement(By.xpath(myxpath4)).click();
-			}
-			catch (Exception e){
-				for (int i = 0; i < 100; i++){
-					System.out.println("(" + myxpath4 + ")[" + i + "]");
-					try {
-						driver.findElement(By.xpath("(" + myxpath4 + ")[" + i + "]")).click();
-						break;
-					}
-					catch (Exception e2){
-						System.out.println();
-					}
-				}
-			}
-		}
-		else {
-			try {
-				DBUtilities createXpath = new DBUtilities(driver);
-				String myxpath = createXpath.xpathMaker(arg1);
-				System.out.println("cliclking on " +myxpath);
-				//Assert.assertTrue(driver.findElement(By.xpath(myxpath)).isDisplayed());
-				Thread.sleep(3000 * sleepMultiplier);
-				driver.findElement(By.xpath(myxpath)).click();
-			}
-			catch (Exception | AssertionError e){
-				
-				DBUtilities createXpath = new DBUtilities(driver);
-				String myxpath = createXpath.xpathMakerContainsText(arg1);
-				System.out.println("cliclking on " +myxpath);
-				//Assert.assertTrue(driver.findElement(By.xpath(myxpath)).isDisplayed());
-				Thread.sleep(3000 * sleepMultiplier);
-				driver.findElement(By.xpath(myxpath)).click();
-			}
-		}
-
-		
-	}
 	
 
 	
-	// doesn't always work, be careful
-	@Given("^I select \"(.*?)\" from \"(.*?)\"$")
-	public void i_select_from(String arg1, String arg2) throws Throwable {
-		Thread.sleep(sleepMultiplier * 3000);
-		if(arg1.equals("SetGoal")){
-			String myxpath = PageFactory.initElements(driver, GoalsAndTargetsPage.class).xpathMakerById1AndId2(arg1, arg2);
-			WebElement element = driver.findElement(By.xpath(myxpath));
-			JavascriptExecutor executor = (JavascriptExecutor)driver;
-			executor.executeScript("arguments[0].click()", element);
-		}
-		else {
-			PageFactory.initElements(driver, LandingPage.class).selectDropdownValue(arg1, arg2);
-			
-		}
-	}
 	
-	// for the strange dropdowns on the DB Results website, currently doesn't work, be careful
+	// this is for checking checkbox
+		@Given("^I click on \"(.*?)\" checkbox$")
+		public void i_click_on_checkbox(String arg1) throws Throwable {
+			PageFactory.initElements(driver, ForgotYourPasswordPage.class).checkBoxClick(arg1);
+		}
+	
+		// for the strange dropdowns on the DB Results website, currently doesn't work, be careful
 		@Given("^I hover over \"(.*?)\" and click on \"(.*?)\"$")
 		public void i_hover_over_and_click_on(String arg1, String arg2) throws Throwable {
 			//Thread.sleep(sleepMultiplier * 3000);
@@ -820,246 +968,127 @@ public class StepImpe {
 			//JavascriptExecutor executor = (JavascriptExecutor)driver;
 			((JavascriptExecutor)driver).executeScript("arguments[0].click()", hoverElement2);
 			//executor.executeScript(, hoverElement2);
+		
+		}	
+		
+		// for clicking on text
+		@And("^I click on \"(.*?)\"$")
+		public void i_click_on(String arg1) throws Throwable {
 			
+			// give time for page loading
+			Thread.sleep(3000 * sleepMultiplier);
+			Pattern datePattern = Pattern.compile("\\d\\d\\d\\d\\d\\d\\d\\d"); // date pattern as used in the old calendar popup
+
+			// this if block was used to click on the calendar popup; it is now depreciated
+			if (datePattern.matcher(arg1).matches()){
+				DBUtilities createXpath = new DBUtilities(driver);
+				String myxpath4 = createXpath.xpathMakerContainsCustomField("dyc-date", arg1);
+				try {
+					driver.findElement(By.xpath(myxpath4)).click();
+				}
+				catch (Exception e){
+					for (int i = 0; i < 100; i++){
+						System.out.println("(" + myxpath4 + ")[" + i + "]");
+						try {
+							driver.findElement(By.xpath("(" + myxpath4 + ")[" + i + "]")).click();
+							break;
+						}
+						catch (Exception e2){
+							System.out.println();
+						}
+					}
+				}
+			}
+			else {
+				try {
+					DBUtilities createXpath = new DBUtilities(driver);
+					String myxpath = createXpath.xpathMaker(arg1);
+					System.out.println("cliclking on " +myxpath);
+					//Assert.assertTrue(driver.findElement(By.xpath(myxpath)).isDisplayed());
+					Thread.sleep(3000 * sleepMultiplier);
+					driver.findElement(By.xpath(myxpath)).click();
+				}
+				catch (Exception | AssertionError e){
+					
+					DBUtilities createXpath = new DBUtilities(driver);
+					String myxpath = createXpath.xpathMakerContainsText(arg1);
+					System.out.println("cliclking on " +myxpath);
+					//Assert.assertTrue(driver.findElement(By.xpath(myxpath)).isDisplayed());
+					Thread.sleep(3000 * sleepMultiplier);
+					driver.findElement(By.xpath(myxpath)).click();
+				}
+			}
+
 			
-//			Actions builder = new Actions(driver);
-//			//builder.moveToElement(hoverElement).build().perform();
-//			hoverElement.click();
-////			By locator = By.id("clickElementID");
-////			driver.click(locator);
-//			builder.moveToElement(driver.findElement(By.xpath(myxpath2))).build().perform();
-//			builder.click();
-////			builder.moveToElement(driver.findElement(By.xpath(myxpath2))).click();
-//			driver.findElement(By.xpath(myxpath2)).click();
-		}
-	
-	
-	// check for field text and text boxes
-	@And("^I enter the details as$")
-	public void I_enter_then_details_as(DataTable table) throws Throwable {
-
-		PageFactory.initElements(driver, DBUtilities.class).enterCucumbertableValuesInUI(table);
-
-	}
-	
-	// simple wait
-	@Then("^I wait for \"(.*?)\" millisecond$")
-	public void i_wait_for_millisecond(long arg1) throws Throwable {
-		Thread.sleep(arg1 * sleepMultiplier);
-	}
-
-
-
-	
-	@Then("^I hover on \"(.*?)\" to verify \"(.*?)\" is displayed$")
-	public void i_hover_on_to_verify_is_displayed(String arg1, String arg2) throws Throwable {
-		PageFactory.initElements(driver, MakeAPaymentPage.class).hoverOverElement(arg1, arg2);
-	}
-
-	// CHECK ELEMENT IS READ ONLY
-	@Then("^I check \"(.*?)\" is readonly$")
-	public void i_check_is(String arg1) throws Throwable {
-		PageFactory.initElements(driver, DBUtilities.class).elementIsreadOnly(arg1);
-	}
-	
-	// this is for checking checkbox
-	@Given("^I click on \"(.*?)\" checkbox$")
-	public void i_click_on_checkbox(String arg1) throws Throwable {
-		PageFactory.initElements(driver, ForgotYourPasswordPage.class).checkBoxClick(arg1);
-	}
-	
-	@Then("^I check \"(.*?)\" exists$")
-	public void i_check_exists(String arg1) throws Throwable {
-		Thread.sleep(3000 * sleepMultiplier);
-		DBUtilities checkElementDisplayed = new DBUtilities(driver);
-		try {
-			String myxpath = checkElementDisplayed.xpathMakerById(arg1);
-			WebElement object = driver.findElement(By.xpath(myxpath));
-			Assert.assertTrue(object.isDisplayed());
-		}
-		catch (Exception e){
-			if (printErrors) e.printStackTrace();
-			String myxpath = checkElementDisplayed.xpathMakerByClass(arg1);
-			WebElement object = driver.findElement(By.xpath(myxpath));
-			Assert.assertTrue(object.isDisplayed());
 		}
 		
 		
-	}
-	
-
-	
-	
-	@Then("^I check \"(.*?)\" does not exist$")
-	public void i_check_does_not_exist(String arg1) throws Throwable {
-		DBUtilities checkElementDisplayed = new DBUtilities(driver);
-		String myxpath = checkElementDisplayed.xpathMakerById(arg1);
-		//WebElement object = driver.findElement(By.xpath(myxpath));
-		System.out.println("Elements found: " + driver.findElements(By.xpath(myxpath)).size());
-		try {
-			Assert.assertFalse(!driver.findElement(By.xpath(myxpath)).isDisplayed());
-		}
-		catch (NoSuchElementException nsee){
-			Assert.assertFalse(false);
-		}
+	//*******************************************************************************************************************************************
+	//*************************************************************** END OF CLICKING STEPS *****************************************************
+	//*******************************************************************************************************************************************
 		
+	//*******************************************************************************************************************************************
+	//*************************************************************** CONTENT SELECTION STEPS ***************************************************
+	//*******************************************************************************************************************************************	
+	
+	/*** STEPS THAT SELECT SOMETHING FROM A LIST GENERATED BY A WEBPAGE OBJECT ***/	
 		
-	}
+	// selects radio button for a perticular section and combine xpaths to avoid radio buttons of same name
+	@Then("^from section \"(.*?)\" I select radio button option \"(.*?)\"$")
+	public void from_section_I_select_radio_button_option(String arg1, String arg2) throws Throwable {
+		String myxpath = new DBUtilities(driver).xpathMakerById(arg1);
 
-	//*********************************************** read popup message********************************************
-	@Then("^I see \"(.*?)\" displayed on popup and I click \"(.*?)\"$")
-	public void i_see_displayed_on_popup_and_I_click(String arg1, String arg2) throws Throwable {
-   Thread.sleep(3000);
-		PageFactory.initElements(driver, DBUtilities.class).checkPopUpMessage(arg1);
-		PageFactory.initElements(driver, DBUtilities.class).clickOnPopUP(arg2);
+		String myxpath2 = new DBUtilities(driver).xpathMakerById(arg2);
 
-	}
-
-
-
-	//***************************************************Landing Page********************************************************
-	@Then("^\"(.*?)\" is displayed as \"(.*?)\"$")
-	public void is_displayed_as(String arg1, String arg2, DataTable table) throws Throwable {
-
-		PageFactory.initElements(driver, LandingPage.class).checkElementPresentOnScreen(table);
-	}
-
+		//following is generating a combined xpath and then looking for element
+		String combineXPaths = new DBUtilities(driver).combine2Xpaths(myxpath, myxpath2);
+		System.out.println(combineXPaths);
+		WebElement elementName2 = driver.findElement(By.xpath(combineXPaths));
 	
-	// Read All SAs
-	@Then("^I read all \"(.*?)\" from the corousel$")
-	public void i_read_all_from_the_corousel(String arg1) throws Throwable {
-		PageFactory.initElements(driver, LandingPage.class).selectSAsFromCorousel(arg1);
-
+		Assert.assertTrue(elementName2.isDisplayed());
+		elementName2.click();
 	}
 	
-	// ******************************************************* new page is launched*********************************************
-	@Then("^a new page \"(.*?)\" is launched$")                 
-	public void a_new_page_is_launched(String arg1) throws Throwable {
-		String URL = driver.getCurrentUrl();
-		System.out.println(URL);
-		new DBUtilities(driver).passControlToNewWindow(arg1);
-	}
-
-	
-	
-	@Then("^I will see message \"(.*?)\"$")    // this is just a workaround for the temp para coming in
-	public void i_will_see_message(String arg1) throws Exception {
-		
-		Assert.assertTrue(driver.findElement(By.xpath("//*[contains(text(),arg1)]")).isDisplayed());
-		System.out.println("Message sucessfully displayed as " +arg1);
-		Thread.sleep(3000 * sleepMultiplier);
-	}
-
-	
-	@When("^I view the left hand panel of screen$")
-	public void i_view_the_left_hand_panel_of_screen() throws Throwable {
-		System.out.println("Checking UI Elements on LHS of screen");
-		Thread.sleep(3000 * sleepMultiplier);
-	}
-
-	@Then("^I see \"(.*?)\" displayed$")
-	public void i_see_and_displayed(String arg1) throws Throwable {
-		PageFactory.initElements(driver, LandingPage.class).checkUIElementIsDisplayed(arg1);
-
-	}
-	
-	@Then("^I see text \"(.*?)\" displayed$")
-	public void i_see_text_displayed(String arg1) throws Throwable {
-      LandingPage AU = PageFactory.initElements(driver, LandingPage.class);
-
-      DBUtilities checkElementDisplayed = new DBUtilities(driver);
-		Thread.sleep(3000 * sleepMultiplier);
-		String myxpath = checkElementDisplayed.xpathMakerContainsText(arg1);                                // keep an eye...changed because of 520
-		System.out.println("checking for text " +myxpath);
-		Assert.assertTrue(driver.getPageSource().contains(arg1)); // other methods may not work
-
-	}
-	
-	@Then("^I see text \"(.*?)\" shown$")
-	public void i_see_text_shown(String arg1) throws Throwable {
-      LandingPage AU = PageFactory.initElements(driver, LandingPage.class);
-      Thread.sleep(3000 * sleepMultiplier);
-      DBUtilities checkElementDisplayed = new DBUtilities(driver);
-		String myxpath = checkElementDisplayed.xpathMakerContainsText(arg1);                                // keep an eye...changed because of 520
-		System.out.println("checking for text " +myxpath);
-	
-		Assert.assertTrue(driver.getPageSource().contains(arg1));
-
-	}
-	
-	@Then("^I see text \"(.*?)\" not displayed$")
-	public void i_see_text_not_displayed(String arg1) throws Throwable {
-		DBUtilities checkElementDisplayed = new DBUtilities(driver);
-		Thread.sleep(3000 * sleepMultiplier);
-		String myxpath = checkElementDisplayed.xpathMakerContainsText(arg1);                                // keep an eye...changed because of 520
-		System.out.println("Checking for text: " +myxpath);
-	
-		try {
-			Assert.assertFalse(!driver.findElement(By.xpath(myxpath)).isDisplayed());
+	// doesn't always work, be careful
+	@Given("^I select \"(.*?)\" from \"(.*?)\"$")
+	public void i_select_from(String arg1, String arg2) throws Throwable {
+		Thread.sleep(sleepMultiplier * 3000);
+		if(arg1.equals("SetGoal")){
+			String myxpath = PageFactory.initElements(driver, GoalsAndTargetsPage.class).xpathMakerById1AndId2(arg1, arg2);
+			WebElement element = driver.findElement(By.xpath(myxpath));
+			JavascriptExecutor executor = (JavascriptExecutor)driver;
+			executor.executeScript("arguments[0].click()", element);
 		}
-		catch (Exception | AssertionError ae){
-			Assert.assertFalse(false);
+		else {
+			PageFactory.initElements(driver, LandingPage.class).selectDropdownValue(arg1, arg2);
+			
 		}
 	}
 	
-	//check i am on right page
-	@Given("^I check I am on \"(.*?)\" page$")
-	public void i_check_I_am_on_page(String arg1) throws Throwable {
-		PageFactory.initElements(driver, BillingHistoryPage.class).checkIfOnRightPage(arg1); 
-		  
-		  System.out.println(" on correct page " +arg1);
-	}
-	
-	@Given("^I check page has URL \"(.*?)\"$")
-	public void i_check_page_has_URL(String arg1) throws Throwable{
-		String currentURL = driver.getCurrentUrl();
-		Assert.assertTrue(arg1.equals(currentURL));
+		 
+		    	
 		
-	}
-	
-	// check that a checkbox is checked
-	@Then("^I see checkbox \"(.*?)\" as selected$")
-	public void i_see_checkbox_as_selected (String arg1) throws Throwable {
-		DBUtilities createXpath = new DBUtilities(driver);
-		String myxpath = createXpath.xpathMakerById(arg1);
-		System.out.println("Checking if checkbox " +myxpath + " has been selected.");
-		Assert.assertTrue(driver.findElement(By.xpath(myxpath)).isSelected());
-	}
-	
-	@Then("^I see checkbox \"(.*?)\" as not selected$")
-	public void i_see_checkbox_as_not_selected (String arg1) throws Throwable {
-		DBUtilities createXpath = new DBUtilities(driver);
-		String myxpath = createXpath.xpathMakerById(arg1);
-		System.out.println("Checking if checkbox " +myxpath + " has not been selected.");
-		Assert.assertFalse(driver.findElement(By.xpath(myxpath)).isSelected());
-	}
-	
-	// check the dropdown displays expected
-	@Then("^\"(.*?)\" displays \"(.*?)\" by default$")
-	public void displays_by_default(String arg1, String arg2) throws Throwable {
-		DBUtilities createXpath = new DBUtilities(driver);
-		String myXpath = createXpath.xpathMakerContainsText(arg2);
-		WebElement dropdownValue = driver.findElement(By.xpath(myXpath));
-		System.out.println(dropdownValue.getText());
-		PageFactory.initElements(driver, AccountFinancialHistorypage.class).isTextPresent(arg2);
 		
-	}
-
-
-	//***************************************** GRAPH CHECKS *********************
-	@Then("^the graph for \"(.*?)\" is displayed$")
-	public void the_graph_for_is_displayed(String arg1) throws Throwable {
-		DBUtilities createXpath = new DBUtilities(driver);
-		String myxpath = createXpath.xpathMakerById(arg1);
-		driver.findElement(By.xpath(myxpath)).click();
+	//*******************************************************************************************************************************************
+	//*************************************************************** COMPARISON STEPS *****************************************************
+	//*******************************************************************************************************************************************
+	
+	/*** STEPS THAT COMPARE ONE THING TO ANOTHER ***/
+	
+	@Then("^I compare \"(.*?)\" to \"(.*?)\" to check if variation is displayed correctly$")
+	public void i_compare_to_to_check_if_variation_is_displayed_correctly(String arg1, String arg2) throws Throwable {
+		LandingPage compareValues = PageFactory.initElements(driver, LandingPage.class);
+		compareValues.compareValueOneToValueTwo(arg1, arg2);
 	}
 	
-	//******************************************Compare values on screen*************************
+	
 	@Then("^I compare \"(.*?)\" to \"(.*?)\"$")
 	public void i_compare_to(String arg1, String arg2) throws Throwable {
 		LandingPage compareValues = PageFactory.initElements(driver, LandingPage.class);
 		compareValues.compareValueOneToValueTwo(arg1, arg2);
 	}
+	
+	
 	// compare 2 values
 	@Then("^I verify \"(.*?)\" is \"(.*?)\" then \"(.*?)\"$")
 	public void i_verify_is_then(String arg1, String arg2, String arg3) throws Throwable {
@@ -1077,68 +1106,108 @@ public class StepImpe {
 		Assert.assertTrue(result.contains(arg2));
 		
 	}
+		
+	//*******************************************************************************************************************************************
+	//*************************************************************** END OF COMPARISON STEPS *****************************************************
+	//*******************************************************************************************************************************************	
 	
-	// selects radio button for a perticular section and combine xpaths to avoid radio buttons of same name
-	@Then("^from section \"(.*?)\" I select radio button option \"(.*?)\"$")
-	public void from_section_I_select_radio_button_option(String arg1, String arg2) throws Throwable {
-		String myxpath = new DBUtilities(driver).xpathMakerById(arg1);
+	//*******************************************************************************************************************************************
+	//*************************************************************** ENTERING CONTENT STEPS *****************************************************
+	//*******************************************************************************************************************************************
 
-		String myxpath2 = new DBUtilities(driver).xpathMakerById(arg2);
+	/*** STEPS THAT INSERT CONTENT INTO AN OBJECT ON THE WEBPAGE ***/
+		
+	// check for field text and text boxes
+	@And("^I enter the details as$")
+	public void I_enter_then_details_as(DataTable table) throws Throwable {
 
-		//following is generating a combined xpath and then looking for element
-		String combineXPaths = new DBUtilities(driver).combine2Xpaths(myxpath, myxpath2);
-		System.out.println(combineXPaths);
-		WebElement elementName2 = driver.findElement(By.xpath(combineXPaths));
-	
-		Assert.assertTrue(elementName2.isDisplayed());
-		elementName2.click();
+		PageFactory.initElements(driver, DBUtilities.class).enterCucumbertableValuesInUI(table);
+
 	}
-	 
-	    
-	@Then("^I compare \"(.*?)\" to \"(.*?)\" to check if variation is displayed correctly$")
-	public void i_compare_to_to_check_if_variation_is_displayed_correctly(String arg1, String arg2) throws Throwable {
-		LandingPage compareValues = PageFactory.initElements(driver, LandingPage.class);
-		compareValues.compareValueOneToValueTwo(arg1, arg2);
-	}
-	//*****************************************************************************************
-	//**********************************************PAYMENT WINDOW*****************************
-	//*****************************************************************************************
-	@Then("^a new \"(.*?)\" window is open$")
-	public void a_new_window_is_open(String arg1) throws Throwable {
-	 // to do... add test once bug is fixed.
-	}
+		
+	//*******************************************************************************************************************************************
+	//*************************************************************** END OF  ENTERING CONTENT STEPS *****************************************************
+	//*******************************************************************************************************************************************	
 	
+		
 	
-	//*****************************************************************************************
-	//**********************************************DATA BASE CONNECTION***********************
-	//*****************************************************************************************
-	
+			
+		
+	//***********************************************************************************************************************************************
+	//*************************************************************** OTHER WEBPAGE INTERACTION *****************************************************
+	//***********************************************************************************************************************************************
 
+	/*** FOR OTHER STEPS THAT DON'T FIT IN ANY OTHER CATEGORIES ***/
 	
-	@Given("^I want to connect to Webservice$")
-	public void i_want_to_connect_to_Webservice() throws Throwable {
-	
-	}
-
-
-	//*****************************************************************************************
-	//**********************************************PDF FILE ***********************
-	//*****************************************************************************************
-	
-	
-	// don't know if this works
-	@Then("^I see a pdf document with name \"(.*?)\" generated$")
-	public void i_see_a_pdf_document_with_name_generated(String arg1) throws Throwable {
-     System.out.println("Yes******************* pdf is open");
-    // DBUtilities moveControlToNewWindow = new DBUtilities(driver);
-     new DBUtilities(driver).passControlToNewWindow(arg1);
-     
+	@Given("^I want to login to portal \"(.*?)\"$")
+	public void i_want_to_login_to_portal(String arg1) throws Throwable {
+		HomePage home = PageFactory.initElements(driver, HomePage.class);
+		home.navigateTo(arg1);	
 	}
 	
+	// for those Outsystems popups, set argument as 0 or 1 if there is only one frame present
+	@Then("^I switch to frame \"(.*?)\"$")
+	public void i_switch_to_frame(String arg1) throws Throwable {
+		int frameNum = Integer.parseInt(arg1);
+		driver.switchTo().frame(frameNum);
+	}
+		
+		
+	@And("^I hit Enter$")
+    public LandingPage I_hit_Enter() throws InterruptedException {
+		PageFactory.initElements(driver, LandingPage.class).hitEnter();
+		Thread.sleep(3000 * sleepMultiplier);
+		
+		return PageFactory.initElements(driver, LandingPage.class);
+	}
 	
-	//*****************************************************************************************
-	//**********************************************Verify Table Rows ***********************
-	//*****************************************************************************************
+	//will be used to tab out to activate a button incase the button is not activated.
+	@Given("^I Tab Out$")
+	public void i_Tab_Out() throws Throwable {
+		new DBUtilities(driver).tabOut();
+	}
+	
+	// scrolls up the page, may not be working correctly
+	@And("^I scroll up$")
+	public void i_scroll_up() throws Throwable {
+		JavascriptExecutor jse = (JavascriptExecutor)driver;
+		jse.executeScript("window.scrollBy(0,-5000)", "");
+	}
+	
+	@Then("^a new page \"(.*?)\" is launched$")                 
+	public void a_new_page_is_launched(String arg1) throws Throwable {
+		String URL = driver.getCurrentUrl();
+		System.out.println(URL);
+		new DBUtilities(driver).passControlToNewWindow(arg1);
+	}
+	
+
+	
+	// simple wait
+	@Then("^I wait for \"(.*?)\" millisecond$")
+	public void i_wait_for_millisecond(long arg1) throws Throwable {
+		Thread.sleep(arg1 * sleepMultiplier);
+	}
+	
+	@When("^I view the left hand panel of screen$")
+	public void i_view_the_left_hand_panel_of_screen() throws Throwable {
+		System.out.println("Checking UI Elements on LHS of screen");
+		Thread.sleep(3000 * sleepMultiplier);
+	}
+	
+	// Read All SAs
+	@Then("^I read all \"(.*?)\" from the corousel$")
+	public void i_read_all_from_the_corousel(String arg1) throws Throwable {
+		PageFactory.initElements(driver, LandingPage.class).selectSAsFromCorousel(arg1);
+
+	}
+
+	@Then("^the graph for \"(.*?)\" is displayed$")
+	public void the_graph_for_is_displayed(String arg1) throws Throwable {
+		DBUtilities createXpath = new DBUtilities(driver);
+		String myxpath = createXpath.xpathMakerById(arg1);
+		driver.findElement(By.xpath(myxpath)).click();
+	}
 	
 	
 	@Then("^I verify the \"(.*?)\" count is \"(.*?)\" to \"(.*?)\"$")
@@ -1148,134 +1217,31 @@ public class StepImpe {
 	}
 	
 
-	// used to have problems with Jenkins, but should work now
-	@Then("^I check \"(.*?)\" has CSS property \"(.*?)\" with value \"(.*?)\"$")
-	public void i_check_has_a_css_property_with_value (String arg1, String arg2, String arg3) throws Throwable{
-		DBUtilities dbutil = new DBUtilities(driver);
-		String xpath1 = dbutil.xpathMakerById(arg1);
-		String property = arg2;
-		String cssVal = arg3;
-		String currentCssVal = null;
-		try {
-			currentCssVal = driver.findElement(By.xpath(xpath1)).getCssValue(arg2);
-			System.out.println("Comparing '" + cssVal + "' against the property value found: '" + currentCssVal + "'.");
-			Assert.assertTrue(cssVal.equals(currentCssVal));
-		}
-		// specifically for finding CSS values of labels with ::after psuedo selector
-		catch (AssertionError | Exception e){
-			try {
-				xpath1 = dbutil.xpathMakerByLabelAndId(arg1);
-				WebElement currentElement = driver.findElement(By.xpath(xpath1));
-				currentCssVal = ((JavascriptExecutor) driver).executeScript("return window.getComputedStyle(arguments[0], '::after').getPropertyValue('" + property + "');",currentElement).toString();
-				System.out.println("Comparing '" + cssVal + "' against the property value found: '" + currentCssVal + "'.");
-				Assert.assertTrue(cssVal.equals(currentCssVal));
-			}
-			catch (AssertionError | Exception ae2) {
-				try {
-					xpath1 = dbutil.xpathMakerBySpanAndId(arg1);
-					WebElement currentElement = driver.findElement(By.xpath(xpath1));
-					currentCssVal = ((JavascriptExecutor) driver).executeScript("return window.getComputedStyle(arguments[0], '::after').getPropertyValue('" + property + "');",currentElement).toString();
-					System.out.println("Comparing '" + cssVal + "' against the property value found: '" + currentCssVal + "'.");
-					Assert.assertTrue(cssVal.equals(currentCssVal));
-				}
-				catch (AssertionError | Exception ae3){
-					xpath1 = dbutil.xpathMakerBySpanAndClass(arg1);
-					WebElement currentElement = driver.findElement(By.xpath(xpath1));
-					currentCssVal = ((JavascriptExecutor) driver).executeScript("return window.getComputedStyle(arguments[0], '::after').getPropertyValue('" + property + "');",currentElement).toString();
-					System.out.println("Comparing '" + cssVal + "' against the property value found: '" + currentCssVal + "'.");
-					Assert.assertTrue(cssVal.equals(currentCssVal));
-				}
-			}
-			
-		}
-	}
-
-	@Then("^I check the values of dropdown \"(.*?)\" are alphabetical$")
-	public void i_check_the_values_of_dropdown_are_alphabetical(String arg1) throws Throwable {
-		DBUtilities dbutil = new DBUtilities(driver);
-		String xpath1 = dbutil.xpathMakerBySelectAndId(arg1);
-		WebElement dropdown = driver.findElement(By.xpath(xpath1));
-		Select select = new Select(dropdown);
-		List<WebElement> allOptions = select.getOptions();
-		
-		// convert into string format
-		List<String> allOptionsText = new ArrayList<String>();
-		for (WebElement e: allOptions){
-			allOptionsText.add(e.getText());
-		}
-		
-		// check for sortability
-		boolean sorted = true;        
-	    for (int i = 1; i < allOptionsText.size(); i++) {
-	        if (allOptionsText.get(i-1).compareTo(allOptionsText.get(i)) > 0){ 
-	        	sorted = false;
-	        }
-	    }
-	    Assert.assertTrue(sorted);
-		
-	}	
-
-	//**************************************************************************************************************************
-	//**************************************************************************************************************************
-	//**************************************************************************************************************************
-	//**************************************************************************************************************************
-	//****************************************************UAP STEPS*************************************************************
-	//**************************************************************************************************************************
-	//**************************************************************************************************************************
-	//**************************************************************************************************************************
-	//**************************************************************************************************************************
 	
 	@Given("^I read the table on \"(.*?)\" page$")
 	public void i_read_the_table_on_page(String arg1) throws Throwable {
 		 new DBUtilities(driver).readTableAndCaptureInString(arg1);
 	}
 	
-	
-	// for those Outsystems popups, set argument as 0 or 1 if there is only one frame present
-	@Then("^I switch to frame \"(.*?)\"$")
-	public void i_switch_to_frame(String arg1) throws Throwable {
-		int frameNum = Integer.parseInt(arg1);
-		driver.switchTo().frame(frameNum);
-	}
-	
-	
-	// similar to print screen, doesn't capture an image of the entire page
-	@Then("^I take a screenshot with name \"(.*?)\"$")
-	public void i_take_a_screenshot(String arg1) throws Throwable {
 
-		File scrFile = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
-		// Now you can do whatever you need to do with it, for example copy somewhere
-		FileUtils.copyFile(scrFile, new File(screenshot_subdirectory + "/" + arg1 +"_screenshot.png"));
-	}
-	
-	// doesn't seem to work, Chrome specific
-	@Then("^I change download destinations$")
-	public void i_change_download_destinations() throws Throwable{
-		String downloadFilepath = "/pdfs";
-		HashMap<String, Object> chromePrefs = new HashMap<String, Object>();
-		chromePrefs.put("profile.default_content_settings.popups", 0);
-		chromePrefs.put("download.default_directory", downloadFilepath);
-		ChromeOptions options = new ChromeOptions();
-		options.setExperimentalOption("prefs", chromePrefs);
-		DesiredCapabilities cap = DesiredCapabilities.chrome();
-		cap.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
-		cap.setCapability(ChromeOptions.CAPABILITY, options);
-		WebDriver new_driver = new ChromeDriver(cap);
-		driver = new_driver;
-	}
+
+
+
 	
 	
-	    //**************************************************************************************************************************
-		//**************************************************************************************************************************
-		//**************************************************************************************************************************
-		//**************************************************************************************************************************
-		//****************************************************GENERIC XPATH FUNCTIONS***********************************************
-		//**************************************************************************************************************************
-		//**************************************************************************************************************************
-		//**************************************************************************************************************************
-		//**************************************************************************************************************************
+	//******************************************************************************************************************************************************
+	//*************************************************************** END OF OTHER WEBPAGE INTERACTION *****************************************************
+	//******************************************************************************************************************************************************
+
+
+
+
+	//**************************************************************************************************************************
+	//****************************************************GENERIC XPATH FUNCTIONS***********************************************
+	//**************************************************************************************************************************
 	
-	/* Use as a last resort */
+	/*** STEPS THAT EXPLICITLY MENTION XPATHS, USE AS A LAST RESORT ***/
+	
 	
 	@Then("^I check object with xpath \"(.*?)\" exists$")
 	public void i_check_object_with_xpath_exists(String arg1) throws Throwable {
@@ -1358,42 +1324,108 @@ public class StepImpe {
 
 		(new Actions(driver)).dragAndDrop(element, target).perform();
 	}
-	// doesn't seem to work on Chrome
-	@Then("^I upload file with path \"(.*?)\" to \"(.*?)\"$")
-	public void i_upload_file_with_path_to(String arg1, String arg2) throws Throwable{
-		DBUtilities dbutil = new DBUtilities(driver);
-		String xpath1 = dbutil.xpathMakerById(arg2);
-		driver.findElement(By.id(xpath1)).click();
-
-	    //put path to your image in a clipboard
-	    StringSelection ss = new StringSelection("C:\\IMG_3827.JPG");
-	    Toolkit.getDefaultToolkit().getSystemClipboard().setContents(ss, null);
-
-	    //imitate mouse events like ENTER, CTRL+C, CTRL+V
-	    Robot robot = new Robot();
-	    robot.keyPress(KeyEvent.VK_ENTER);
-	    robot.keyRelease(KeyEvent.VK_ENTER);
-	    robot.keyPress(KeyEvent.VK_CONTROL);
-	    robot.keyPress(KeyEvent.VK_V);
-	    robot.keyRelease(KeyEvent.VK_V);
-	    robot.keyRelease(KeyEvent.VK_CONTROL);
-	    robot.keyPress(KeyEvent.VK_ENTER);
-	    robot.keyRelease(KeyEvent.VK_ENTER);
 
 
+//**************************************************************************************************************************
+//****************************************************END OF XPATH FUNCTIONS***********************************************
+//**************************************************************************************************************************
+
+
+
+
+
+//**************************************************************************************************************************
+//****************************************************DOES NOT WORK OR WIP ********************************************************
+//**************************************************************************************************************************
+
+	/*** THESE STEPS DO NOT WORK OR ARE STILL IN DEVELOPMENT ***/	
+	
+	
+	// don't know if this works
+	@Then("^I see a pdf document with name \"(.*?)\" generated$")
+	public void i_see_a_pdf_document_with_name_generated(String arg1) throws Throwable {
+     System.out.println("Yes******************* pdf is open");
+    // DBUtilities moveControlToNewWindow = new DBUtilities(driver);
+     new DBUtilities(driver).passControlToNewWindow(arg1);
+     
 	}
 	
+//	@Given("^I want to connect to Webservice$")
+//	public void i_want_to_connect_to_Webservice() throws Throwable {
+//	
+//	}
 	
-	// take screenshot
-		@And("^I store a snapshot of page$")
-		
-		public void I_take_a_snapshot_of_the_above_page_as_a_record() throws Throwable {
-//			File scrFile = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
-//		String dnt = DBUtilities.DNT(null);
-//		System.out.println(dnt);
-//		FileUtils.copyFile(scrFile, new File(dnt+".jpg"));
-	        		 
-		}
+	
+//	@Then("^a new \"(.*?)\" window is open$")
+//	public void a_new_window_is_open(String arg1) throws Throwable {
+//	 // to do... add test once bug is fixed.
+//	}
+//		
+	
+	// doesn't seem to work on Chrome
+//	@Then("^I upload file with path \"(.*?)\" to \"(.*?)\"$")
+//	public void i_upload_file_with_path_to(String arg1, String arg2) throws Throwable{
+//		DBUtilities dbutil = new DBUtilities(driver);
+//		String xpath1 = dbutil.xpathMakerById(arg2);
+//		driver.findElement(By.id(xpath1)).click();
+//
+//	    //put path to your image in a clipboard
+//	    StringSelection ss = new StringSelection("C:\\IMG_3827.JPG");
+//	    Toolkit.getDefaultToolkit().getSystemClipboard().setContents(ss, null);
+//
+//	    //imitate mouse events like ENTER, CTRL+C, CTRL+V
+//	    Robot robot = new Robot();
+//	    robot.keyPress(KeyEvent.VK_ENTER);
+//	    robot.keyRelease(KeyEvent.VK_ENTER);
+//	    robot.keyPress(KeyEvent.VK_CONTROL);
+//	    robot.keyPress(KeyEvent.VK_V);
+//	    robot.keyRelease(KeyEvent.VK_V);
+//	    robot.keyRelease(KeyEvent.VK_CONTROL);
+//	    robot.keyPress(KeyEvent.VK_ENTER);
+//	    robot.keyRelease(KeyEvent.VK_ENTER);
+//
+//
+//	}
+	
+// currently doesn't work
+//	// take screenshot
+//		@And("^I store a snapshot of page$")
+//		
+//		public void I_take_a_snapshot_of_the_above_page_as_a_record() throws Throwable {
+////			File scrFile = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
+////		String dnt = DBUtilities.DNT(null);
+////		System.out.println(dnt);
+////		FileUtils.copyFile(scrFile, new File(dnt+".jpg"));
+//	        		 
+//		}
+//
+//}
 
+// doesn't seem to work, Chrome specific
+//@Then("^I change download destinations$")
+//public void i_change_download_destinations() throws Throwable{
+//	String downloadFilepath = "/pdfs";
+//	HashMap<String, Object> chromePrefs = new HashMap<String, Object>();
+//	chromePrefs.put("profile.default_content_settings.popups", 0);
+//	chromePrefs.put("download.default_directory", downloadFilepath);
+//	ChromeOptions options = new ChromeOptions();
+//	options.setExperimentalOption("prefs", chromePrefs);
+//	DesiredCapabilities cap = DesiredCapabilities.chrome();
+//	cap.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
+//	cap.setCapability(ChromeOptions.CAPABILITY, options);
+//	WebDriver new_driver = new ChromeDriver(cap);
+//	driver = new_driver;
+//}
+//
+
+//// similar to print screen, doesn't capture an image of the entire page
+//@Then("^I take a screenshot with name \"(.*?)\"$")
+//public void i_take_a_screenshot(String arg1) throws Throwable {
+//
+//	File scrFile = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
+//	// Now you can do whatever you need to do with it, for example copy somewhere
+//	FileUtils.copyFile(scrFile, new File(screenshot_subdirectory + "/" + arg1 +"_screenshot.png"));
+//}
+	
 }
 
